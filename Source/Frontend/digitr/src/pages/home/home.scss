@@ -1,0 +1,27 @@
+page-home {
+    .backgroundimage {
+        z-index: -10;
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        object-fit: cover;
+        opacity: 0.5
+    }
+    .center {
+        margin: auto;
+        text-align: center;
+        padding-top: 40vh;
+        font-weight: normal;
+    }
+    .signinbutton {
+        margin: auto;
+        width: 10%;
+        object-fit: contain;
+        display: block;
+        padding-top: 40px;
+        min-width: 200px;
+    }
+    .abcRioButton {
+        width: 100% !important;
+    }
+}
