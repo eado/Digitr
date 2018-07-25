@@ -1,5 +1,3 @@
-// declare var gapi: any;
-
 import { Component } from '@angular/core';
 import { Platform, LoadingController, NavController } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
@@ -19,7 +17,6 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();
       splashScreen.hide();
-      
       gapi.load('auth2', () => {
         let auth2 = gapi.auth2.init({});
         if (auth2.isSignedIn.get()) {
@@ -34,8 +31,6 @@ export class MyApp {
             this.rootPage = HomePage;
           }
         });
-
-  
       });
     });
   }
