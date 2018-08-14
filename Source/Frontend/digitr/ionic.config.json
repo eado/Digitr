@@ -1,8 +1,7 @@
 {
-  "name": "digitr",
-  "app_id": "",
-  "type": "ionic-angular",
+  "name": "Digitr",
   "integrations": {
     "cordova": {}
-  }
+  },
+  "type": "ionic-angular"
 }

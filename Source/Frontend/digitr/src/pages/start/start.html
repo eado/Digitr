@@ -7,12 +7,63 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title (click)="logout()">start</ion-title>
+    <ion-title (click)="logout()">First Steps</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
-<ion-content padding>
+<ion-content>
+  <img class="backgroundimage" src="assets/bg-old.png" />
+  <div class="container">
+    <h1 id="header">Welcome to Digitr!</h1>
+    <h4>If you need help, view the <a href="#">help guide</a> or contact us at <a href="tel://612-605-4449">+1 612-605-4449</a> and <a href="mailto:info@digitrapp.com">info@digitrapp.com</a></h4>
+    <br>
+    <h3>Are you a <button ion-button small (click)="student()">student</button> or a <button (click)="teacher()" small ion-button>teacher/administrator</button>?</h3>
+    <br>
+    <p *ngIf="!districtExists && studentClicked">Sorry, but your school {{ domain }} doesn't seem to be using Digitr. <br> Refer your teacher/administrator to this <a href="http://digitrapp.com">site</a>.</p>
+    <p *ngIf="districtExists && studentClicked">Your school {{ domain }} uses Digitr! <br> <button ion-button (click)="addStudent()">Start using Digitr</button></p>
+    <p *ngIf="districtExists && teacherClicked && !(schools.length > 0)">Your district {{ domain }} uses Digitr! <br> <button ion-button (click)="addTeacher()">Start using Digitr</button></p>
+    <div *ngIf="districtExists && teacherClicked && (schools.length > 0)">Your district {{ domain }} uses Digitr! 
+      <br> Which school do you teach at? 
+      <div *ngFor="let s of schools">
+        <h4 *ngIf="this.school == s" class="active" (click)="this.school = s">{{ s }} <ion-icon name="checkmark-circle"></ion-icon></h4>
+        <h4 *ngIf="this.school != s" (click)="this.school = s">{{ s }} <ion-icon name="checkmark-circle"></ion-icon></h4>
+      </div>
+      <br>
+      <button ion-button (click)="addTeacher()">Start using Digitr</button>
+    </div>
+    <p *ngIf="districtExists && teacherClicked">Didn't setup Digitr? Contact us at <a href="tel://1-612-605-4449">+1 612-605-4449</a></p>
+    <p *ngIf="!districtExists && teacherClicked">Your district {{ domain }} is not using Digitr. Would you like to set Digitr up for your district? <br> <b>NOTE:</b> Click on the button below ONLY if you have full and complete authority to apply for services on behalf of your school district. <br>  <button (click)="setup()" ion-button >Setup Digitr</button></p>
+    <br>
+    <div *ngIf="agreed">
+      <h3>Thank you for signing up with Digitr. We have just a few more questions.</h3>
+      <br>
+      <h4>Are there any more domains you would like to associate with your district?</h4>
+      <p>Example: You use the {{ domain }} domain, but your students might use students.{{ domain }}.</p>
+      <h4 *ngFor="let ndomain of domains">{{ ndomain }} <ion-icon (click)="domains.pop(ndomain)"name="remove-circle"></ion-icon></h4>
+      <h4><ion-input #adddom placeholder="Add Domain"></ion-input><ion-icon (click)="domains.push(adddom.value); adddom.value = ''" name="add-circle"></ion-icon></h4>
 
-</ion-content>
+      <br>
+
+      <h4>Would you like to add any schools to your district? (optional)</h4>
+      <p>Example: Your district might have multiple elementary and middle schools.</p>
+      <h4 *ngFor="let school of schools">{{ school }} <ion-icon (click)="schools.pop(school)"name="remove-circle"></ion-icon></h4>
+      <h4><ion-input #addschool placeholder="Add School"></ion-input><ion-icon (click)="addSchool(addschool.value); addschool.value = ''" name="add-circle"></ion-icon></h4>
+
+      <br>
+      <h4 *ngIf="schools">Which school do you go to?</h4>
+      <div *ngFor="let s of schools">
+        <h4 *ngIf="this.school == s" class="active" (click)="this.school = s">{{ s }} <ion-icon name="checkmark-circle"></ion-icon></h4>
+        <h4 *ngIf="this.school != s" (click)="this.school = s">{{ s }} <ion-icon name="checkmark-circle"></ion-icon></h4>
+      </div>
+
+      <br>
+      <h4>Last question: How many passes would you like to issue to each student?</h4>
+      <h4><ion-input #p type="number" placeholder="Number of passes" (click)="pass = p.value" (keyup)="pass = p.value"></ion-input></h4>
+      <br>
+      <button ion-button (click)="completeSetup()">Complete Digitr Setup</button>
+
+    </div>
+  </div>
+</ion-content> 

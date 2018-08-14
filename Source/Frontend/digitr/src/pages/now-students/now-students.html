@@ -1,0 +1,165 @@
+<!--
+  Generated template for the NowStudentsPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+  <ion-toolbar>
+      <ion-buttons start>
+          <button ion-button (click)="signout()">
+            Sign Out
+          </button>
+        </ion-buttons>
+      <ion-segment [(ngModel)]="currentPage">
+        <ion-segment-button value="now">
+          Now
+        </ion-segment-button>
+        <ion-segment-button value="usepass">
+          Use Pass
+        </ion-segment-button>
+        <ion-segment-button value="history">
+          History
+        </ion-segment-button>
+        <ion-segment-button value="messages">
+          Messages
+        </ion-segment-button>
+      </ion-segment>
+      <ion-buttons end>
+        <a target="_new" href="https://mpassapp.com">
+          <button ion-button icon-only>
+            <ion-icon name="help-circle"></ion-icon>
+          </button>
+        </a>
+      </ion-buttons>
+  </ion-toolbar>
+
+</ion-header>
+
+
+<ion-content>
+  <div *ngIf="currentPage == 'now'" class="top">
+      <round-progress [current]="passesRemaining" [max]="totalPasses" [responsive]="false" color="#EC6C4D" class="progress"></round-progress>
+      <h1 class="stat"><b>{{ passesRemaining }}</b> passes left</h1>
+  </div>
+  <div *ngIf="currentPage =='history'">
+      <div *ngIf="history.length < 1">
+        <h1 class="nohistory">No history available</h1>
+      </div>
+      <ion-list no-border no-lines *ngFor="let pass of history">
+        <ion-list-header>
+          <span *ngIf="pass.name == 'Free'">Free Pass</span>
+          <span *ngIf="pass.name != 'Free'">Pass {{ pass.name }}</span>
+        </ion-list-header>
+        <ion-item>
+          Destination
+          <ion-note item-end>
+            {{ pass.destination }}
+          </ion-note>
+        </ion-item>
+    
+        <ion-item>
+          Teacher
+          <ion-note item-end>
+            {{ pass.teacher }}
+          </ion-note>
+        </ion-item>
+    
+        <ion-item>
+          Timestamp
+          <ion-note item-end>
+            {{ tts(pass.timestamp) }}
+          </ion-note>
+        </ion-item>
+    
+        <ion-item>
+          Minutes
+          <ion-note item-end>
+            {{ pass.minutes }}
+          </ion-note>
+        </ion-item>
+        
+        <ion-item>
+          End Time
+          <ion-note *ngIf="pass.timestamp_end" item-end>
+            {{ tts(pass.timestamp_end) }}
+          </ion-note>
+          <ion-note *ngIf="!pass.timestamp_end" item-end>
+            Pass in duration.
+          </ion-note>
+        </ion-item>
+
+        <ion-item>
+            Total Time
+            <ion-note item-end>
+              {{ totalTime(pass.timestamp, pass.minutes, pass.timestamp_end) }}
+            </ion-note>
+          </ion-item>
+      </ion-list>
+  </div>
+  <div *ngIf="currentPage == 'usepass'">
+      <br>
+      <ion-list radio-group [(ngModel)]="dest">
+        <ion-list-header>
+          Destination
+        </ion-list-header>
+        <ion-item>
+          <ion-label>Restroom</ion-label>
+          <ion-radio value="Restroom"></ion-radio>
+        </ion-item>
+        <ion-item>
+          <ion-label>Media Center</ion-label>
+          <ion-radio value="Media Center"></ion-radio>
+        </ion-item>
+        <ion-item>
+          <ion-label>Locker</ion-label>
+          <ion-radio value="Locker"></ion-radio>
+        </ion-item>
+        
+        <ion-item *ngFor="let destination of districtInfo.destinations">
+          <ion-label>{{ destination.value }}</ion-label>
+          <ion-radio value="{{ destination.value }}"></ion-radio>
+        </ion-item>
+      </ion-list>
+      <ion-list>
+        <ion-list-header>
+          Teacher
+        </ion-list-header>
+        <ion-item>
+          {{ teacher }}
+          <ion-note item-end>
+            <button small outline ion-button (click)="pickTeacher()">Pick Teacher</button>
+          </ion-note>
+        </ion-item>
+      </ion-list>
+      <button *ngIf="!teacher" full disabled ion-button large>Request Pass</button>
+      <button *ngIf="teacher" full ion-button large (click)="usepass()">Request Pass</button>
+  </div>
+  <div *ngIf="currentPage == 'messages' && user">
+      <div *ngIf="user.messages.length < 1">
+        <h1 class="nohistory">No messages</h1>
+      </div>
+      <ion-list *ngFor="let message of user.messages" [ngSwitch]="message.type">
+        <ion-list-header>{{ message.user }}</ion-list-header>
+        <ion-item text-wrap *ngSwitchCase="'pass_approved'">
+          <b>{{ message.title }}: </b>{{ message.subTitle }}
+          <ion-note item-end color="dark"><button ion-button small (click)="viewTimer(message)">View Timer</button></ion-note>
+          <ion-note item-end><button ion-button small (click)="back(message.timestamp, message.email)">I'm back</button></ion-note>
+          <!-- <ion-note item-end><button ion-button small (click)="dismiss(message.timestamp)">Dismiss</button></ion-note> -->
+        </ion-item>
+        <ion-item text-wrap *ngSwitchCase="'pass_rejected'">
+          <b>{{ message.title }}: </b>{{ message.subTitle }}
+          <ion-note item-end><button ion-button small (click)="dismiss(message.timestamp)">Dismiss</button></ion-note>
+        </ion-item>
+        <ion-item text-wrap *ngSwitchCase="'pass_done'">
+          <b>{{ message.title }}: </b>{{ message.subTitle }}
+          <ion-note item-end><button ion-button small (click)="back(message.pass_time, message.email)">I'm back</button></ion-note>
+          <!-- <ion-note item-end><button ion-button small (click)="dismiss(message.timestamp)">Dismiss</button></ion-note> -->
+        </ion-item>
+        <ion-item text-wrap *ngSwitchDefault>
+          <b>{{ message.title }}: </b>{{ message.subTitle }}
+          <ion-note item-end><button ion-button small>Dismiss</button></ion-note>
+        </ion-item>
+      </ion-list>
+  </div>
+</ion-content>

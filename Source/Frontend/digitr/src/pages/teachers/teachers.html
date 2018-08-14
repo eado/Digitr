@@ -1,0 +1,35 @@
+<!--
+  Generated template for the TeachersPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+    <ion-navbar>
+      <ion-toolbar>
+        <ion-title>Teachers</ion-title>
+        <ion-buttons end>
+            <button (click)="done()" ion-button>Done</button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-navbar>
+  
+  </ion-header>
+  
+  
+  <ion-content>
+    <ion-searchbar #search (keyup)="filterTeachers(search.value)"></ion-searchbar>
+    <ion-list radio-group>
+      <ion-list-header>Frequent</ion-list-header>
+      <ion-item *ngFor="let nteacher of frequentTeachers">
+        <ion-label>{{ nteacher }}</ion-label>
+        <ion-radio (click)="this.teacher = nteacher" value="{{ nteacher }}"></ion-radio>
+      </ion-item>
+      <ion-list-header>All</ion-list-header>
+      <ion-item *ngFor="let nteacher of filteredTeachers">
+        <ion-label>{{ nteacher }}</ion-label>
+        <ion-radio (click)="this.teacher = nteacher" value="{{ nteacher }}"></ion-radio>
+      </ion-item>
+    </ion-list>
+  </ion-content>

@@ -7,12 +7,29 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { StartPage } from '../pages/start/start';
+import { ServerconnService } from '../serverconn.service';
+import { AuthService } from '../auth.service';
+import { EulaPage } from '../pages/eula/eula';
+import { NowStudentsPage } from '../pages/now-students/now-students';
+import { NowTeachersPage } from '../pages/now-teachers/now-teachers';
+import { FormsModule } from '../../node_modules/@angular/forms';
+import { RoundProgressModule } from 'angular5-svg-round-progressbar';
+import { TeachersPage } from '../pages/teachers/teachers';
+import { ApprovepassPage } from '../pages/approvepass/approvepass';
+import { TimerPage } from '../pages/timer/timer';
+import { GooglePlus } from '../../node_modules/@ionic-native/google-plus';
 
 @NgModule({
   declarations: [
     MyApp,
     HomePage,
-    StartPage
+    StartPage,
+    NowStudentsPage,
+    NowTeachersPage,
+    EulaPage,
+    TeachersPage,
+    ApprovepassPage,
+    TimerPage
   ],
   imports: [
     BrowserModule,
@@ -23,18 +40,29 @@ import { StartPage } from '../pages/start/start';
           tabsHideOnSubPages: true
         }
       }
-    })
+    }),
+    FormsModule,
+    RoundProgressModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
     HomePage,
-    StartPage
+    StartPage,
+    NowStudentsPage,
+    NowTeachersPage,
+    EulaPage,
+    TeachersPage,
+    ApprovepassPage,
+    TimerPage
   ],
   providers: [
     StatusBar,
     SplashScreen,
-    {provide: ErrorHandler, useClass: IonicErrorHandler}
+    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    ServerconnService,
+    AuthService,
+    GooglePlus
   ]
 })
 export class AppModule {}
