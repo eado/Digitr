@@ -2,7 +2,8 @@ import { Injectable } from "../node_modules/@angular/core";
 import { ServerconnService } from "./serverconn.service";
 import { resolveDefinition } from "../node_modules/@angular/core/src/view/util";
 import { ValueTransformer } from "../node_modules/@angular/compiler/src/util";
-import { Platform } from "../node_modules/ionic-angular/umd";
+import { Platform } from "../node_modules/ionic-angular";
+import { GooglePlus } from "../node_modules/@ionic-native/google-plus";
 
 export function capitalizeName(name) {
     return name.replace(/\b(\w)/g, s => s.toUpperCase());
@@ -10,7 +11,7 @@ export function capitalizeName(name) {
 
 @Injectable()
 export class AuthService {
-    constructor(private scs: ServerconnService, public plt: Platform) {}
+    constructor(private scs: ServerconnService, public plt: Platform, public googlePlus: GooglePlus) {}
 
     user: any;
 
@@ -103,7 +104,12 @@ export class AuthService {
     }
 
     async getDistrictInfo(): Promise<any> {
-        let token;         if (this.plt.is('ios')) {             token = this.user.idToken         } else {             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         }
+        let token;         
+        if (this.plt.is('ios')) {
+            token = this.user.idToken         
+        } else {             
+            token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
+        }
         let domain = localStorage.getItem('email').split('@')[1];
 
         return new Promise<any>((resolve, _) => {
@@ -124,7 +130,12 @@ export class AuthService {
     // }
 
     async request_pass(teacherEmail: string, dest: string) {
-        let token;         if (this.plt.is('ios')) {             token = this.user.idToken         } else {             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         }
+        let token;         
+        if (this.plt.is('ios')) {             
+            token = this.user.idToken         
+        } else {             
+            token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
+        }
         return new Promise<void>((resolve, _) => {
             this.scs.add({request: "request_pass", email: localStorage.getItem("email"), user: teacherEmail, token: token, dest: dest}, (value) => {
                 resolve()
@@ -133,7 +144,12 @@ export class AuthService {
     }
 
     async denyPass(messageTime: number, user: string) {
-        let token;         if (this.plt.is('ios')) {             token = this.user.idToken         } else {             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         }
+        let token;         
+        if (this.plt.is('ios')) {             
+            token = this.user.idToken         
+        } else {             
+            token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
+        }
         return new Promise<void>((r, _) => {
             this.scs.add({request: "deny_pass", user: user, token: token, email: localStorage.getItem('email'), message_time: messageTime}, () => {
                 r()
@@ -142,7 +158,12 @@ export class AuthService {
     }
 
     async dismissMessage(messageTime: number) {
-        let token;         if (this.plt.is('ios')) {             token = this.user.idToken         } else {             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         }
+        let token;         
+        if (this.plt.is('ios')) {             
+            token = this.user.idToken         
+        } else {             
+            token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
+        }
         return new Promise<void>((r, _) => {
             this.scs.add({request: "deny_pass", token: token, email: localStorage.getItem('email'), message_time: messageTime}, () => {
                 r()
@@ -151,7 +172,12 @@ export class AuthService {
     }
 
     async approvePass(free: boolean, destination: string, minutes: number, user: string) {
-        let token;         if (this.plt.is('ios')) {             token = this.user.idToken         } else {             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         }
+        let token;         
+        if (this.plt.is('ios')) {             
+            token = this.user.idToken         
+        } else {             
+            token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
+        }
         return new Promise<void>((r, _) => {
             this.scs.add({
                 request: "approve_pass",
@@ -168,7 +194,12 @@ export class AuthService {
     }
 
     async back_from_pass(timestamp: number, teacher: string) {
-        let token;         if (this.plt.is('ios')) {             token = this.user.idToken         } else {             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         }
+        let token;         
+        if (this.plt.is('ios')) {             
+            token = this.user.idToken         
+        } else {             
+            token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
+        }
         return new Promise<void>((r, _) => {
             this.scs.add({
                 request: "back_from_pass",
@@ -183,6 +214,10 @@ export class AuthService {
     }
 
     signout() {
+        if (this.plt.is('ios')) {
+            this.googlePlus.logout()
+            location = location
+        }
         gapi.auth2.getAuthInstance().signOut()
         localStorage.setItem('signedIn', "false")
         location = location

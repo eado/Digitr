@@ -18,7 +18,7 @@ export class MyApp {
 
   auth2;
 
-  constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen, private a: AuthService, public googlePlus: GooglePlus) {
+  constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen, private a: AuthService, private googlePlus: GooglePlus) {
     
     
     platform.ready().then(() => {
@@ -26,8 +26,7 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       statusBar.overlaysWebView(false);
       splashScreen.hide();
-      if (platform.is('ios')) {
-        this.rootPage = HomePage
+      if (platform.is('cordova')) {
         console.log('ios')
         this.googlePlus.trySilentLogin().then(
           (user) => {

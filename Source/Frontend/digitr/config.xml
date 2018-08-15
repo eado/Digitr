@@ -3,7 +3,7 @@
     <name>Digitr</name>
     <description>Tap it. Time it. Count it.</description>
     <author email="info@mpassapp.com" href="https://digitrapp.com/">Eaideas, LLC</author>
-    <content original-src="index.html" src="http://10.0.1.21:8100" />
+    <content original-src="index.html" src="http://10.0.1.21:8101" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
