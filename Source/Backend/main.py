@@ -1,4 +1,4 @@
-#!${BACKEND}venv/bin/python3
+#!$BACKEND/venv/bin/python3
 
 import json
 import logging
