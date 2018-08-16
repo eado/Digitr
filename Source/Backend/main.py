@@ -1,4 +1,4 @@
-#!/Users/omarelamri/Local/Digitr3/Source/Backend/venv/bin/python3
+#!${BACKEND}venv/bin/python3
 
 import json
 import logging
