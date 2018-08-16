@@ -9,6 +9,7 @@ import { AuthService } from '../auth.service';
 import { NowTeachersPage } from '../pages/now-teachers/now-teachers';
 import { NowStudentsPage } from '../pages/now-students/now-students';
 import { GooglePlus } from '@ionic-native/google-plus'
+import { ScreenOrientation } from '@ionic-native/screen-orientation';
 
 @Component({
   templateUrl: 'app.html'
@@ -18,17 +19,24 @@ export class MyApp {
 
   auth2;
 
-  constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen, private a: AuthService, private googlePlus: GooglePlus) {
+  constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen, private a: AuthService, private googlePlus: GooglePlus, public so: ScreenOrientation) {
     
     
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
-      statusBar.overlaysWebView(false);
+      statusBar.overlaysWebView(true);
+      statusBar.isVisible = true;
+      statusBar.styleDefault()
+
       splashScreen.hide();
       if (platform.is('cordova')) {
+        so.unlock()
         console.log('ios')
-        this.googlePlus.trySilentLogin().then(
+        this.googlePlus.trySilentLogin({
+          scopes: 'profile email',
+          offline: false
+        }).then(
           (user) => {
             if (user) {
               this.a.user = user;

@@ -44,7 +44,7 @@ export class AuthService {
 
         return new Promise<[boolean, string[]]>((resolve, _) => {
             this.scs.add({request: 'get_district', domain: domain}, (value) => {
-                resolve([value.user_exists, value.is_teacher])
+                resolve([value.exists, value.schools])
             });
         })
     }
@@ -53,7 +53,7 @@ export class AuthService {
         let name;
         let token;
 
-        if (this.plt.is('ios')) {
+        if (this.plt.is('cordova')) {
             name = capitalizeName(this.user.displayName)
             token = this.user.idToken
         } else {
@@ -74,7 +74,7 @@ export class AuthService {
 
     async addDistrict(domains: string[], pass: number, schools?: string[]): Promise<void> {
         let token;
-        if (this.plt.is('ios')) {
+        if (this.plt.is('cordova')) {
             token = this.user.idToken
         } else {
             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token
@@ -92,7 +92,12 @@ export class AuthService {
     }
 
     async getUser(user: string, callback: ((any) => void)) {
-        let token;         if (this.plt.is('ios')) {             token = this.user.idToken         } else {             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         }
+        let token;         
+        if (this.plt.is('cordova')) {             
+            token = this.user.idToken         
+        } else {             
+            token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
+        }
         this.scs.add({request: "get_user", email: localStorage.getItem('email'), token: token, user: user}, (value) => {
             callback(value.user)
         })
@@ -105,7 +110,7 @@ export class AuthService {
 
     async getDistrictInfo(): Promise<any> {
         let token;         
-        if (this.plt.is('ios')) {
+        if (this.plt.is('cordova')) {
             token = this.user.idToken         
         } else {             
             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
@@ -118,7 +123,7 @@ export class AuthService {
     }
 
     // async listOfEmailsToNames(list: string[]): Promise<[string, string][]> {
-    //     let token;         if (this.plt.is('ios')) {             token = this.user.idToken         } else {             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         }
+    //     let token;         if (this.plt.is('cordova')) {             token = this.user.idToken         } else {             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         }
     //     let list2: [string, string][] = [];
         
     //     for (let el of list) {
@@ -131,7 +136,7 @@ export class AuthService {
 
     async request_pass(teacherEmail: string, dest: string) {
         let token;         
-        if (this.plt.is('ios')) {             
+        if (this.plt.is('cordova')) {             
             token = this.user.idToken         
         } else {             
             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
@@ -145,7 +150,7 @@ export class AuthService {
 
     async denyPass(messageTime: number, user: string) {
         let token;         
-        if (this.plt.is('ios')) {             
+        if (this.plt.is('cordova')) {             
             token = this.user.idToken         
         } else {             
             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
@@ -159,7 +164,7 @@ export class AuthService {
 
     async dismissMessage(messageTime: number) {
         let token;         
-        if (this.plt.is('ios')) {             
+        if (this.plt.is('cordova')) {             
             token = this.user.idToken         
         } else {             
             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
@@ -173,7 +178,7 @@ export class AuthService {
 
     async approvePass(free: boolean, destination: string, minutes: number, user: string) {
         let token;         
-        if (this.plt.is('ios')) {             
+        if (this.plt.is('cordova')) {             
             token = this.user.idToken         
         } else {             
             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
@@ -195,7 +200,7 @@ export class AuthService {
 
     async back_from_pass(timestamp: number, teacher: string) {
         let token;         
-        if (this.plt.is('ios')) {             
+        if (this.plt.is('cordova')) {             
             token = this.user.idToken         
         } else {             
             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
@@ -213,8 +218,30 @@ export class AuthService {
         })
     }
 
+    async setNotification(id: string) {
+        let token; 
+        let ios = false;        
+        if (this.plt.is('cordova')) {             
+            token = this.user.idToken   
+            ios = true      
+        } else {             
+            token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
+        }
+        return new Promise<void>((r, _) => {
+            this.scs.add({
+                request: "set_notification",
+                token: token,
+                email: localStorage.getItem('email'),
+                id: id,
+                ios: ios
+            }, () => {
+                r()
+            })
+        })
+    }
+
     signout() {
-        if (this.plt.is('ios')) {
+        if (this.plt.is('cordova')) {
             this.googlePlus.logout()
             location = location
         }

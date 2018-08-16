@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { ToastController } from "../node_modules/ionic-angular";
 import { checkAndUpdateBinding } from "../node_modules/@angular/core/src/view/util";
 
-const URL = "ws://10.0.1.21:9001";
+const URL = "wss://home.omarelamri.me:9001";
 
 @Injectable()
 export class ServerconnService {

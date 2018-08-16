@@ -18,6 +18,6 @@
 </ion-header>
 
 <ion-content>
-  <round-progress [current]="seconds" [max]="totalSeconds" [responsive]="false" color="#EC6C4D" class="progress"></round-progress>
+  <div id="timer" class="progress"></div>
   <h1 class="stat" [ngClass]="{'red': totalSeconds < seconds}"><b>{{ seconds }}</b></h1>
 </ion-content>

@@ -1,9 +1,13 @@
+declare var require: any;
+var ProgressBar = require('progressbar.js')
+
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ModalController, ToastController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController, ToastController, AlertController, Platform } from 'ionic-angular';
 import { AuthService } from '../../auth.service';
 import { ServerconnService } from '../../serverconn.service';
 import { TeachersPage } from '../teachers/teachers';
 import { TimerPage } from '../timer/timer';
+import { Push, PushOptions } from '@ionic-native/push'
 
 /**
  * Generated class for the NowStudentsPage page.
@@ -35,17 +39,43 @@ export class NowStudentsPage {
   dest = 'Restroom'
   teacher;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public modalCtrl: ModalController, private scs: ServerconnService, public toastCtrl: ToastController, public alertCtrl: AlertController) {
+  circle;
+
+  constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public modalCtrl: ModalController, private scs: ServerconnService, public toastCtrl: ToastController, public alertCtrl: AlertController, public push: Push, public plt: Platform) {
   }
 
   async ionViewDidLoad() {
+    this.circle = new ProgressBar.Circle('#passCircle', {
+      color: '#EC6C4D',
+      strokeWidth: 5,
+      trailWidth: 5
+    })
+    let options: PushOptions = {
+      ios: {
+        alert: true,
+        badge: false,
+        sound: true
+      },
+      browser: {}
+    }
+    
+    let pushObject = this.push.init(options);
+    pushObject.on('registration').subscribe((reg) => {
+      console.log(reg)
+      this.a.setNotification(reg.registrationId)
+    })
+
     console.log('ionViewDidLoad NowStudentsPage');
     this.a.getUser(localStorage.getItem('email'), (user) => {
       if (!this.first && user.messages) {
+        user.messages = (user.messages as any[]).reverse()
         for (let message of user.messages) {
           let isNew = true
           for (let message2 of this.user.messages) {
             isNew = message.timestamp != message2.timestamp
+          }
+          if (Date.now() / 1000 - message.timestamp > 300) {
+            this.dismiss(message.timestamp)
           }
           if (isNew) {
             let alert = this.alertCtrl.create({
@@ -77,11 +107,11 @@ export class NowStudentsPage {
             usedPasses.push(pass)
           }
         }
-    
         this.totalPasses = this.districtInfo.pass
         this.passesRemaining = this.totalPasses - usedPasses.length
         this.teachers = this.districtInfo.teachers
         this.teachersWithNames = this.districtInfo.teachers_with_names
+        this.circle.animate(this.passesRemaining / this.totalPasses)
       })
       this.first = false;
     })

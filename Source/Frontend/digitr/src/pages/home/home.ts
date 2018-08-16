@@ -20,8 +20,8 @@ export class HomePage {
   }
 
   async signin() {
-    if (this.plt.is('ios')) {
-      let user = await this.googlePlus.login()
+    if (this.plt.is('cordova')) {
+      let user = await this.googlePlus.login({scopes: "profile email"})
 
       if (user.email.split('@')[1] == 'gmail.com') {
         let modal = this.alertCtrl.create({
@@ -36,7 +36,7 @@ export class HomePage {
 
       let token = user.idToken;
       let value = await this.a.serverSignin(token)
-      
+      console.log(token)
       if (!value[0]) {
         this.googlePlus.disconnect()
         let modal = this.alertCtrl.create({
@@ -51,7 +51,7 @@ export class HomePage {
       localStorage.setItem('email', user.email)
 
       let user_exists = await this.a.userExists(user.email);
-
+      this.a.user = user
       if (user_exists[0]) {
         if (user_exists[1]) {
           this.navCtrl.push(NowTeachersPage);
