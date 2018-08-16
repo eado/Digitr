@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams, ToastController, AlertController, 
 import { ServerconnService } from '../../serverconn.service';
 import { AuthService } from '../../auth.service';
 import { ApprovepassPage } from '../approvepass/approvepass';
+import { PushOptions, Push } from '@ionic-native/push';
 
 /**
  * Generated class for the NowTeachersPage page.
@@ -24,17 +25,36 @@ export class NowTeachersPage {
 
   currentPage = "messages"
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, public modalCtrl: ModalController, public toastCtrl: ToastController) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, public modalCtrl: ModalController, public toastCtrl: ToastController, public push: Push) {
   }
 
   ionViewDidLoad() {
+    let options: PushOptions = {
+      ios: {
+        alert: true,
+        badge: false,
+        sound: true
+      },
+      browser: {}
+    }
+    
+    let pushObject = this.push.init(options);
+    pushObject.on('registration').subscribe((reg) => {
+      console.log(reg)
+      this.a.setNotification(reg.registrationId)
+    })
+    
     console.log('ionViewDidLoad NowTeachersPage');
     this.a.getUser(localStorage.getItem('email'), (user) => {
       if (!this.first && user.messages) {
+        user.messages = (user.messages as any[]).reverse()
         for (let message of user.messages) {
           let isNew = true
           for (let message2 of this.user.messages) {
             isNew = message.timestamp != message2.timestamp
+          }
+          if (Date.now() / 1000 - message.timestamp > 300) {
+            this.dismiss(message.timestamp)
           }
           if (isNew) {
             let alert = this.alertCtrl.create({

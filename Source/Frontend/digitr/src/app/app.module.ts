@@ -13,11 +13,12 @@ import { EulaPage } from '../pages/eula/eula';
 import { NowStudentsPage } from '../pages/now-students/now-students';
 import { NowTeachersPage } from '../pages/now-teachers/now-teachers';
 import { FormsModule } from '../../node_modules/@angular/forms';
-import { RoundProgressModule } from 'angular5-svg-round-progressbar';
 import { TeachersPage } from '../pages/teachers/teachers';
 import { ApprovepassPage } from '../pages/approvepass/approvepass';
 import { TimerPage } from '../pages/timer/timer';
 import { GooglePlus } from '../../node_modules/@ionic-native/google-plus';
+import { Push } from '@ionic-native/push';
+import { ScreenOrientation } from '@ionic-native/screen-orientation';
 
 @NgModule({
   declarations: [
@@ -41,8 +42,7 @@ import { GooglePlus } from '../../node_modules/@ionic-native/google-plus';
         }
       }
     }),
-    FormsModule,
-    RoundProgressModule
+    FormsModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -62,7 +62,9 @@ import { GooglePlus } from '../../node_modules/@ionic-native/google-plus';
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     ServerconnService,
     AuthService,
-    GooglePlus
+    GooglePlus,
+    Push,
+    ScreenOrientation
   ]
 })
 export class AppModule {}

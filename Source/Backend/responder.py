@@ -9,9 +9,10 @@ from google.oauth2 import id_token
 from pymongo import MongoClient
 from bson.json_util import dumps
 from time import sleep
+from apns import APNs, Payload
 
 CLIENT_ID = "1089587494564-2ntl0ugt0d8e7cm8muclg0b81e5aj91h.apps.googleusercontent.com"
-
+CLIENT_ID_2 = "1089587494564-63vl8kls1v7jc3qlgrmn087ponappo6q.apps.googleusercontent.com"
 clients = []
 
 class Responder:
@@ -55,6 +56,8 @@ class Responder:
             self.approve_pass()
         if request['request'] == 'back_from_pass':
             self.back_from_pass()
+        if request['request'] == 'set_notification':
+            self.set_notification()
 
     def get_district(self):
         district = self.db.districts.find_one({'domains': {'$in': [self.request['domain']]}})
@@ -107,7 +110,18 @@ class Responder:
             else:
                 return False
         except ValueError:
-            return False
+            try: 
+                idinfo = id_token.verify_oauth2_token(self.request['token'], requests.Request(), CLIENT_ID_2)
+
+                if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+                    raise ValueError('Wrong issuer.')
+
+                if idinfo['email'] == self.request['email']:
+                    return True
+                else:
+                    return False
+            except ValueError:
+                return False
 
     
     def signin(self):
@@ -123,7 +137,19 @@ class Responder:
             else:
                 self.send({'success': True, 'user_exists': False})
         except ValueError as e:
-            self.send({'error': str(e)})
+            try: 
+                idinfo = id_token.verify_oauth2_token(self.request['token'], requests.Request(), CLIENT_ID_2)
+
+                if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+                    raise ValueError('Wrong issuer.')
+
+                user = self.db.users.find_one({'email': idinfo['email']})
+                if user:
+                    self.send({'success': True, 'user_exists': True})
+                else:
+                    self.send({'success': True, 'user_exists': False})
+            except ValueError as e:
+                self.send({'error': str(e)})
 
     def add_user(self):
         if 'school' in self.request:
@@ -141,7 +167,10 @@ class Responder:
             'email': self.request['email'],
             'is_teacher': self.request['is_teacher'],
             'school': school,
-            'domain': domain
+            'domain': domain,
+            'history': [],
+            'messages': [],
+            'notifications': []
         })
 
         district = self.db.districts.find_one({'domains': {'$in': [domain]}})
@@ -217,7 +246,12 @@ class Responder:
     def send_message(self, message, users):
         for email in users:
             self.db.users.update_one({'email': email}, {'$push': {'messages': message}})
-            message['request'] = 'message'
+            user = self.db.users.find_one({'email': email})
+            for noti in user['notifications']:
+                if noti['type'] == 'ios':
+                    apns = APNs(use_sandbox=True, cert_file="crt.pem", key_file='key.pem')
+                    payload = Payload(alert="{}: {}".format(message['title'], message['subTitle']), sound="default", mutable_content=True)
+                    apns.gateway_server.send_notification(noti['id'], payload)
 
     def request_pass(self):
         if not self.verify_user():
@@ -358,4 +392,26 @@ class Responder:
             'subTitle': "{} is back.".format(user['name']),
             'timestamp': datetime.datetime.now().timestamp()
         }, [self.request['teacher']])
+        self.send({'success': True})
+
+    def set_notification(self):
+        if not self.verify_user():
+            self.send({'error': 'uns'})
+            return
+        if self.request['ios']:
+            self.db.users.update_one({'email': self.request['email']}, 
+                                     {'$push': 
+                                        {'notifications': 
+                                            {'type': 'ios', 'id': self.request['id']}
+                                        }
+                                     }
+                                    )
+        else:
+            self.db.users.update_one({'email': self.request['email']}, 
+                                     {'$push': 
+                                        {'notifications': 
+                                            {'type': 'web', 'id': self.request['id']}
+                                        }
+                                     }
+                                    )
         self.send({'success': True})

@@ -38,8 +38,8 @@
 
 
 <ion-content>
-  <div *ngIf="currentPage == 'now'" class="top">
-      <round-progress [current]="passesRemaining" [max]="totalPasses" [responsive]="false" color="#EC6C4D" class="progress"></round-progress>
+  <div [hidden]="currentPage != 'now'" class="top">
+      <div id="passCircle" class="progress"></div>
       <h1 class="stat"><b>{{ passesRemaining }}</b> passes left</h1>
   </div>
   <div *ngIf="currentPage =='history'">
