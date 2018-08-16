@@ -1,3 +1,3 @@
 source ${BACKEND}/venv/bin/activate
-mongod &
-sudo ${BACKEND}/main.py
+mongod --port 3232 &
+sudo python3 ${BACKEND}/main.py

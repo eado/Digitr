@@ -1,7 +1,6 @@
-#!$BACKEND/venv/bin/python3
+#!${BACKEND}/venv/bin/python3
 
 import json
-import logging
 import sys
 import os
 
@@ -13,12 +12,12 @@ from responder import Responder, clients
 
 from pymongo import MongoClient
 
-mongo_client = MongoClient()
+mongo_client = MongoClient(port=3232)
 
 def message_received(client, server, message):
     try:
-        def start_responder(client, server, message, mongo_client):
-            Responder(client, server, message, mongo_client)
+        def start_responder(client, server, message, mc):
+            Responder(client, server, message, mc)
 
         p = Thread(target=start_responder, args=(client, server, message, mongo_client))
         p.start()
@@ -27,7 +26,7 @@ def message_received(client, server, message):
     except KeyError as e:
         server.send_message(client, 'Invalid request. {}'.format(e))
 
-def client_left(client1, server):
+def client_left(client1):
     if client1 in clients:
         clients.remove(client1)
 
@@ -43,8 +42,7 @@ if __name__ == '__main__':
         start_server()
     except KeyboardInterrupt:
         os.system("tput setaf 7")
-        logging.warn("Shutting down")
         os.system("killall mongod")
         sys.exit(0)
     except ValueError:
-        pass
+        pass 
