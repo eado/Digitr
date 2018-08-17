@@ -15,6 +15,8 @@ CLIENT_ID = "1089587494564-2ntl0ugt0d8e7cm8muclg0b81e5aj91h.apps.googleuserconte
 CLIENT_ID_2 = "1089587494564-63vl8kls1v7jc3qlgrmn087ponappo6q.apps.googleusercontent.com"
 clients = []
 
+nots_sent = []
+
 class Responder:
     server = None
     client = None 
@@ -247,11 +249,13 @@ class Responder:
         for email in users:
             self.db.users.update_one({'email': email}, {'$push': {'messages': message}})
             user = self.db.users.find_one({'email': email})
-            for noti in user['notifications']:
-                if noti['type'] == 'ios':
-                    apns = APNs(use_sandbox=True, cert_file="crt.pem", key_file='key.pem')
-                    payload = Payload(alert="{}: {}".format(message['title'], message['subTitle']), sound="default", mutable_content=True)
-                    apns.gateway_server.send_notification(noti['id'], payload)
+            if {'user': user['email'], 'message': message['timestamp']} not in nots_sent:
+                for noti in user['notifications']:
+                    if noti['type'] == 'ios':
+                        apns = APNs(use_sandbox=True, cert_file="crt.pem", key_file='key.pem')
+                        payload = Payload(alert="{}: {}".format(message['title'], message['subTitle']), sound="default", mutable_content=True)
+                        apns.gateway_server.send_notification(noti['id'], payload)
+                nots_sent.append({'user': user['email'], 'message': message['timestamp']})
 
     def request_pass(self):
         if not self.verify_user():
@@ -400,7 +404,7 @@ class Responder:
             return
         if self.request['ios']:
             self.db.users.update_one({'email': self.request['email']}, 
-                                     {'$push': 
+                                     {'$addToSet': 
                                         {'notifications': 
                                             {'type': 'ios', 'id': self.request['id']}
                                         }
@@ -408,7 +412,7 @@ class Responder:
                                     )
         else:
             self.db.users.update_one({'email': self.request['email']}, 
-                                     {'$push': 
+                                     {'$addToSet': 
                                         {'notifications': 
                                             {'type': 'web', 'id': self.request['id']}
                                         }

@@ -26,7 +26,7 @@ def message_received(client, server, message):
     except KeyError as e:
         server.send_message(client, 'Invalid request. {}'.format(e))
 
-def client_left(client1):
+def client_left(client1, server):
     if client1 in clients:
         clients.remove(client1)
 
