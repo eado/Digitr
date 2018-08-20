@@ -158,7 +158,7 @@
         </ion-item>
         <ion-item text-wrap *ngSwitchDefault>
           <b>{{ message.title }}: </b>{{ message.subTitle }}
-          <ion-note item-end><button ion-button small>Dismiss</button></ion-note>
+          <ion-note item-end><button ion-button small (click)="dismiss(message.timestamp)">Dismiss</button></ion-note>
         </ion-item>
       </ion-list>
   </div>

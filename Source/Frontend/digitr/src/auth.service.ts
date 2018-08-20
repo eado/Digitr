@@ -240,6 +240,100 @@ export class AuthService {
         })
     }
 
+    async getTeacherStats(): Promise<any> {
+        let token;     
+        if (this.plt.is('cordova')) {             
+            token = this.user.idToken       
+        } else {             
+            token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
+        }
+        return new Promise<any>((r, _) => {
+            this.scs.add({
+                request: "get_teacher_stats",
+                token: token,
+                email: localStorage.getItem('email'),
+            }, value => {
+                r(value)
+            })
+        })
+    }
+
+    async getTeacherUsers(): Promise<string[]> {
+        let token;     
+        if (this.plt.is('cordova')) {             
+            token = this.user.idToken       
+        } else {             
+            token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
+        }
+        return new Promise<string[]>((r, _) => {
+            this.scs.add({
+                request: "get_teacher_users",
+                token: token,
+                email: localStorage.getItem('email'),
+            }, value => {
+                r(value.users)
+            })
+        })
+    }
+
+    async getUserFromName(name: string): Promise<any> {
+        let token;     
+        if (this.plt.is('cordova')) {             
+            token = this.user.idToken       
+        } else {             
+            token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
+        }
+        return new Promise<any>((r, _) => {
+            this.scs.add({
+                request: "get_user_from_name",
+                token: token,
+                email: localStorage.getItem('email'),
+                user: name
+            }, value => {
+                r(value)
+            })
+        })
+    }
+
+    async sendMessage(user: string, message: string): Promise<void> {
+        let token;     
+        if (this.plt.is('cordova')) {             
+            token = this.user.idToken       
+        } else {             
+            token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
+        }
+        return new Promise<void>((r, _) => {
+            this.scs.add({
+                request: "send_custom_message",
+                token: token,
+                email: localStorage.getItem('email'),
+                user: user,
+                message: message
+            }, value => {
+                r()
+            })
+        })
+    }
+
+    async getCSVTeacher(): Promise<string> {
+        let token;     
+        if (this.plt.is('cordova')) {             
+            token = this.user.idToken       
+        } else {             
+            token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
+        }
+        return new Promise<string>((r, _) => {
+            this.scs.add({
+                request: "get_csv_for_teacher",
+                token: token,
+                email: localStorage.getItem('email'),
+            }, value => {
+                r(value.csv_data)
+            })
+        })
+    }
+
+
     signout() {
         if (this.plt.is('cordova')) {
             this.googlePlus.logout()

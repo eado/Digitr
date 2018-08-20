@@ -62,5 +62,113 @@
         <ion-note item-end><button ion-button small (click)="dismiss(message.timestamp)">Dismiss</button></ion-note>
       </ion-item>
     </ion-list>
-</div>
+  </div>
+  <div *ngIf="currentPage == 'analytics'">
+      <h1 class="nohistory" *ngIf="!analytics">Analytics is not enabled by your administrator.</h1>
+      <div *ngIf="analytics">
+        <div *ngIf="analyticsPage == 'stats'">
+          <ion-grid>
+            <ion-row>
+              <div col-md-6 col-12>
+                <ion-card color="dark">
+                  <ion-card-header>
+                    Free passes approved 
+                  </ion-card-header>
+                  <ion-card-content>
+                      <h1>{{ stats.freePasses }}</h1>
+                  </ion-card-content>
+                </ion-card>
+              </div>
+              <div col-md-6 col-12>
+                <ion-card color="primary">
+                  <ion-card-header>
+                    Regular passes approved 
+                  </ion-card-header>
+                  <ion-card-content>
+                      <h1>{{ stats.regularPasses }}</h1>
+                  </ion-card-content>
+                </ion-card>
+              </div>
+              <div col-md-6 col-12>
+                <ion-card color="light">
+                  <ion-card-header>
+                    Total number of passes approved
+                  </ion-card-header>
+                  <ion-card-content>
+                      <h1>{{ stats.passesIssued }}</h1>
+                  </ion-card-content>
+                </ion-card>
+              </div>
+              <div col-md-6 col-12>
+                <ion-card color="dark">
+                  <ion-card-header>
+                    Average amount of time approved
+                  </ion-card-header>
+                  <ion-card-content>
+                      <h1>{{ stats.avgMinutes }} minutes</h1>
+                  </ion-card-content>
+                </ion-card>
+              </div>
+              <div col-md-6 col-12>
+                <ion-card color="primary">
+                  <ion-card-header>
+                    Average time spent
+                  </ion-card-header>
+                  <ion-card-content>
+                      <h1>{{ stats.avgInterval }}</h1>
+                  </ion-card-content>
+                </ion-card>
+              </div>
+              <div col-md-6 col-12>
+                <ion-card color="light">
+                  <ion-card-header>
+                    Most Valuable Player (student who used the most passes)
+                  </ion-card-header>
+                  <ion-card-content>
+                      <h1>{{ stats.mvp }}</h1>
+                  </ion-card-content>
+                </ion-card>
+              </div>
+              <div col-md-6 col-12>
+                <ion-card color="dark">
+                  <ion-card-header>
+                    Currently Out
+                  </ion-card-header>
+                  <ion-card-content>
+                      <h1>{{ stats.currentlyOut }}</h1>
+                      <h1 *ngIf="stats.currentlyOut.length < 1">Nobody</h1>
+                  </ion-card-content>
+                </ion-card>
+              </div>
+            </ion-row>
+          </ion-grid>
+        </div>
+        <div *ngIf="analyticsPage == 'search'">
+            <ion-searchbar (ionInput)="getItems($event)"></ion-searchbar>
+            <ion-list>
+              <ion-item (click)="getUser(user)" *ngFor="let user of filteredStudents">{{ user }}<ion-note item-end><ion-icon  name="arrow-forward"></ion-icon></ion-note></ion-item>
+            </ion-list>
+        </div>
+      </div>
+  </div>
+  
 </ion-content>
+<div *ngIf="currentPage == 'analytics'">
+  <div *ngIf="analytics">
+      <ion-footer>
+          <ion-toolbar>
+            <ion-buttons start>
+              <button ion-button (click)="getCSV()">Get CSV</button>
+            </ion-buttons>
+            <ion-segment [(ngModel)]="analyticsPage">
+              <ion-segment-button value="stats">
+                Stats
+              </ion-segment-button>
+              <ion-segment-button value="search">
+                Search User
+              </ion-segment-button>
+            </ion-segment>
+          </ion-toolbar>
+        </ion-footer>
+  </div>
+</div>

@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { IonicPage, NavController, NavParams, ToastController, AlertController, Alert, ModalController } from 'ionic-angular';
 import { ServerconnService } from '../../serverconn.service';
 import { AuthService } from '../../auth.service';
 import { ApprovepassPage } from '../approvepass/approvepass';
 import { PushOptions, Push } from '@ionic-native/push';
+import { AnauserPage } from '../anauser/anauser';
 
 /**
  * Generated class for the NowTeachersPage page.
@@ -15,7 +16,7 @@ import { PushOptions, Push } from '@ionic-native/push';
 @IonicPage()
 @Component({
   selector: 'page-now-teachers',
-  templateUrl: 'now-teachers.html',
+  templateUrl: 'now-teachers.html'
 })
 export class NowTeachersPage {
   first = true;
@@ -24,6 +25,14 @@ export class NowTeachersPage {
   district;
 
   currentPage = "messages"
+  analyticsPage = "stats"
+
+  dist;
+  analytics;
+
+  students;
+  filteredStudents;
+  stats;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, public modalCtrl: ModalController, public toastCtrl: ToastController, public push: Push) {
   }
@@ -79,6 +88,22 @@ export class NowTeachersPage {
       this.user = user
       this.first = false;
     })
+    this.a.getDistrictInfo().then(dist => {
+      this.dist = dist;
+      if (dist.analytics) {
+        this.analytics = true
+      } else {
+        this.analytics = false
+      }
+      console.log(this.analytics)
+    })
+    this.getAnalytics()
+  }
+
+  async getAnalytics() {
+    this.stats = await this.a.getTeacherStats()
+    this.students = await this.a.getTeacherUsers()
+    this.filteredStudents = this.students
   }
 
   deny(message: number, user: string) {
@@ -125,8 +150,37 @@ export class NowTeachersPage {
     audio.play()
   }
 
+  getItems(event) {
+    let text = event.target.value
+    this.filteredStudents = this.students.filter((item) => {
+      return (item.toLowerCase().indexOf(text.toLowerCase()) > -1);
+    })
+  }
+
   signout() {
     this.a.signout()
+  }
+
+  async getUser(user1) {
+    console.log(user1)
+    let user = await this.a.getUserFromName(user1)
+
+    let modal = this.modalCtrl.create(AnauserPage, {user: user.user})
+    modal.present()
+  }
+
+  async getCSV() {
+    let string = await this.a.getCSVTeacher()
+
+    var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.hidden = true
+
+    let blob = new Blob([string], {type: 'text/csv'})
+    let url = window.URL.createObjectURL(blob)
+    a.href = url;
+    a.download = 'DigitrExport-' + Date.now() + '.csv'
+    a.click()
   }
 
 }
