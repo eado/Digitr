@@ -46,8 +46,6 @@ class Responder:
             self.get_user()
         if request['request'] == 'get_district_info':
             self.get_district_info()
-        if request['request'] == 'get_name_for_user':
-            self.get_name_for_user()
         if request['request'] == 'request_pass':
             self.request_pass()
         if request['request'] == 'deny_pass':
@@ -60,6 +58,16 @@ class Responder:
             self.back_from_pass()
         if request['request'] == 'set_notification':
             self.set_notification()
+        if request['request'] == 'get_teacher_stats':
+            self.get_teacher_stats()
+        if request['request'] == 'get_teacher_users':
+            self.get_teacher_users()
+        if request['request'] == 'get_user_from_name':
+            self.get_user_from_name()
+        if request['request'] == 'send_custom_message':
+            self.send_custom_message()
+        if request['request'] == 'get_csv_for_teacher':
+            self.get_csv_for_teacher()
 
     def get_district(self):
         district = self.db.districts.find_one({'domains': {'$in': [self.request['domain']]}})
@@ -83,14 +91,6 @@ class Responder:
         self.send({'schools': district["schools"], 'pass': district['pass'], 
                    'teachers': district['teachers'], 'destinations': district.get('destinations'), 
                    'teachers_with_names': teachers_with_names, 'admins': district["admins"], 'analytics': district.get('analytics')})
-
-    def get_name_for_user(self):
-        if not self.verify_user():
-            self.send({'error': 'uns'})
-            return
-
-        user = self.db.users.find_one({'email': self.request['user']})
-        self.send({'name': user['name']})
 
     def user_exists(self):
         user = self.db.users.find_one({'email': self.request['email']})
@@ -125,6 +125,16 @@ class Responder:
             except ValueError:
                 return False
 
+    def isAdmin(self):
+        if not self.verify_user():
+            return False
+        user = self.db.users.find_one({'email': self.request['email']})
+        district = self.db.districts.find_one({'domains': {"$in": [user["domain"]]}})
+
+        if user['email'] in district['admins']:
+            return True
+        else:
+            return False
     
     def signin(self):
         try:
@@ -213,9 +223,7 @@ class Responder:
 
         current_user = self.db.users.find_one({'email': self.request['email']})
         user_is_user = self.request['email'] == self.request['user']
-
         user = self.db.users.find_one({'email': self.request['user']})
-
         if current_user['is_teacher']:
             self.send({'success': True, 'user': user})
         else:
@@ -224,16 +232,25 @@ class Responder:
             else:
                 self.send({'error': 'unu'}) 
                 return    
-        
-        clients.append(self.client)
-        while True:
-            sleep(1)
-            if not self.client in clients:
-                return
-            new_user = self.db.users.find_one({'email': self.request['user']})
-            if new_user != user:
-                user = new_user
-                self.send({'success': True, 'user': user})
+        if not self.request.get('once'):
+            clients.append(self.client)
+            while True:
+                sleep(1)
+                if not self.client in clients:
+                    return
+                new_user = self.db.users.find_one({'email': self.request['user']})
+                if new_user != user:
+                    user = new_user
+                    self.send({'success': True, 'user': user})
+
+    def get_user_from_name(self):
+        if not self.verify_user():
+            self.send({'error': 'uns'})
+            return
+        current_user = self.db.users.find_one({'email': self.request['email']})
+        user = self.db.users.find_one({'name': self.request['user'], 'history.teacher': current_user['name']})
+        if current_user['is_teacher']:
+            self.send({'success': True, 'user': user})
 
 
     def send(self, message):
@@ -419,3 +436,115 @@ class Responder:
                                      }
                                     )
         self.send({'success': True})
+
+    def get_teacher_users(self):
+        if not self.verify_user():
+            self.send({'error': 'uns'})
+            return
+        user = self.db.users.find_one({'email': self.request['email']})
+        district = self.db.districts.find_one({'domains': {"$in": [user["domain"]]}})
+        if not user["is_teacher"]:
+            self.send({'error': 'unt'})
+            return
+        self.send({'users': self.db.users.distinct("name", {"is_teacher": False, "domain": {"$in": district['domains']}, "history.teacher": user['name']})})
+
+    def get_teacher_stats(self):
+        if not self.verify_user():
+            self.send({'error': 'uns'})
+            return
+        teacher = self.db.users.find_one({'email': self.request['email']})
+        usersRef = self.db.users.find({'history.teacher': teacher['name']}, {'history': True, 'name': True})
+        
+        passes = []
+        intervals = 0
+        minutesTotal = 0
+        counts = {}
+        freePasses = []
+        regularPasses = []
+        currently_out = []
+
+        for user in usersRef:
+            for passs in user['history']:
+                if passs['teacher'] == teacher['name']:
+                    passs['user'] = user['name']
+                    passes.append(passs)
+                    if passs['name'] == 'Free':
+                        freePasses.append(passs)
+                    else:
+                        regularPasses.append(passs)
+                    counts[passs['user']] = counts.get(passs['user'], 0) + 1
+                    if not passs.get('timestamp_end'):
+                        currently_out.append(passs['user'])
+                    if passs.get('timestamp_end'):
+                        intervals += passs['timestamp_end'] - passs['timestamp']
+                    minutesTotal += passs['minutes']
+        
+        mvp = max(counts, key=counts.get)
+
+        passesIssued = len(passes)
+            
+        avgInterval = str(int((intervals / passesIssued) / 60)) + ' minutes and ' + str(int(intervals / passesIssued) % 60) + ' seconds'
+        avgMinutes = int(minutesTotal / passesIssued)
+
+        self.send({'passesIssued': passesIssued, 'avgInterval': avgInterval, 'avgMinutes': avgMinutes, 'freePasses': len(freePasses), 'regularPasses': len(regularPasses), 'mvp': mvp, 'currentlyOut': currently_out})
+
+    def send_custom_message(self):
+        if not self.verify_user():
+            self.send({'error': 'uns'})
+            return
+        user = self.db.users.find_one({'email': self.request['email']})
+        self.send_message({
+            'user': user['name'],
+            'email': user['email'],
+            'type': 'custom',
+            'title': user['name'],
+            'subTitle': self.request['message'],
+            'timestamp': datetime.datetime.now().timestamp()
+        }, [self.request['user']])
+        self.send({'success': True})
+
+    def send_custom_message_to_all(self):
+        if not self.isAdmin():
+            self.send({'error': 'una'})
+            return
+        user = self.db.users.find_one({'email': self.request['email']})
+        district = self.db.districts.find_one({'domains': {"$in": [user["domain"]]}})
+        self.send_message({
+            'user': user['name'],
+            'email': user['email'],
+            'type': 'custom',
+            'title': user['name'],
+            'subTitle': self.request['message'],
+            'timestamp': datetime.datetime.now().timestamp()
+        }, district['students'])
+        self.send({'success': True})
+
+    def get_csv_for_teacher(self):
+        if not self.verify_user():
+            self.send({'error': 'uns'})
+            return
+        teacher = self.db.users.find_one({'email': self.request['email']})
+        usersRef = self.db.users.find({'history.teacher': teacher['name']}, {'history': True, 'name': True})
+        text = "User,Pass,Destination,Teacher,Minutes,Timestamp,End Time\n"
+
+        for user in usersRef:
+            for passs in user['history']:
+                if passs['teacher'] == teacher['name']:
+                    text += (user['name'] + ',')
+                    text += (str(passs['name']) + ',')
+                    text += (passs['destination'] + ',')
+                    text += (passs['teacher'] + ',')
+                    text += (str(passs['minutes']) + ',')
+
+                    timestamp = datetime.datetime.fromtimestamp(
+                                    passs['timestamp']
+                                ).strftime('%Y-%m-%d %H:%M:%S')
+                    text += (timestamp + ',')
+
+                    timestamp_end = datetime.datetime.fromtimestamp(
+                                        passs['timestamp_end']
+                                    ).strftime('%Y-%m-%d %H:%M:%S')
+                    text += (timestamp_end + ',')
+                    text += ('\n')
+        self.send({'csv_data': text})             
+        

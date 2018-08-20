@@ -19,6 +19,7 @@ import { TimerPage } from '../pages/timer/timer';
 import { GooglePlus } from '../../node_modules/@ionic-native/google-plus';
 import { Push } from '@ionic-native/push';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
+import { AnauserPage } from '../pages/anauser/anauser';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { ScreenOrientation } from '@ionic-native/screen-orientation';
     EulaPage,
     TeachersPage,
     ApprovepassPage,
-    TimerPage
+    TimerPage,
+    AnauserPage
   ],
   imports: [
     BrowserModule,
@@ -54,7 +56,8 @@ import { ScreenOrientation } from '@ionic-native/screen-orientation';
     EulaPage,
     TeachersPage,
     ApprovepassPage,
-    TimerPage
+    TimerPage,
+    AnauserPage
   ],
   providers: [
     StatusBar,
