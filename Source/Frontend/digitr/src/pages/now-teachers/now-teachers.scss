@@ -7,4 +7,11 @@ page-now-teachers {
     ion-card-content h1 {
         font-size: 7vh !important
     }
+    #admin {
+        width: 90%;
+        margin-left: 5%;
+    }
+    .danger {
+        color: red;
+    }
 }

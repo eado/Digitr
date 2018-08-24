@@ -18,6 +18,9 @@
       <ion-segment-button value="analytics">
         Analytics
       </ion-segment-button>
+      <ion-segment-button [hidden]="!isAdmin" value="admin">
+        Admin
+      </ion-segment-button>
     </ion-segment>
     <ion-buttons end>
       <a target="_new" href="https://mpassapp.com">
@@ -135,8 +138,30 @@
                     Currently Out
                   </ion-card-header>
                   <ion-card-content>
-                      <h1>{{ stats.currentlyOut }}</h1>
+                      <ion-list>
+                        <ion-item *ngFor="let user of stats.currentlyOut">{{ user }}</ion-item>
+                      </ion-list>
                       <h1 *ngIf="stats.currentlyOut.length < 1">Nobody</h1>
+                  </ion-card-content>
+                </ion-card>
+              </div>
+              <div col-md-6 col-12>
+                <ion-card color="primary">
+                  <ion-card-header>
+                    Most Used Destination
+                  </ion-card-header>
+                  <ion-card-content>
+                      <h1>{{ stats.mud }}</h1>
+                  </ion-card-content>
+                </ion-card>
+              </div>
+              <div col-md-6 col-12 *ngIf="viewAsAdmin">
+                <ion-card color="light">
+                  <ion-card-header>
+                    Most Valuable Teacher (teacher who approved the most passes)
+                  </ion-card-header>
+                  <ion-card-content>
+                      <h1>{{ stats.mvt }}</h1>
                   </ion-card-content>
                 </ion-card>
               </div>
@@ -146,10 +171,115 @@
         <div *ngIf="analyticsPage == 'search'">
             <ion-searchbar (ionInput)="getItems($event)"></ion-searchbar>
             <ion-list>
+              <ion-item (click)="sendToAll()" *ngIf="isAdmin"><a>Send message to all students and teachers</a></ion-item>
               <ion-item (click)="getUser(user)" *ngFor="let user of filteredStudents">{{ user }}<ion-note item-end><ion-icon  name="arrow-forward"></ion-icon></ion-note></ion-item>
             </ion-list>
         </div>
       </div>
+  </div>
+  <div *ngIf="currentPage == 'admin'" padding>
+    <ion-list>
+      <div *ngIf="dist.analytics">
+          <ion-list-header *ngIf="dist.analytics"><h1>Analytics enabled</h1></ion-list-header>
+          <ion-item>{{ payment.count }} students are enrolled under this district.</ion-item>
+      </div>
+      <div *ngIf="!dist.analytics">
+          <ion-list-header *ngIf="!dist.analytics"><h1>Analytics not enabled</h1></ion-list-header>
+          <ion-item>{{ payment.count }} students are enrolled under this district.</ion-item>
+          <ion-item>Current price to enable Analytics: ${{ payment.count / 2 }} / year. ($0.50 / user)</ion-item>
+          <ion-item><a (click)="startPayment()">Pay for Analytics via PayPal</a></ion-item>
+      </div>
+    </ion-list>
+    <ion-list>
+      <ion-list-header>Edit number of passes allowed per student</ion-list-header> 
+      <ion-item>
+        <ion-input #pass type="number" value="{{ dist.pass }}"></ion-input>
+        <button (click)="edit($event, 'pass', pass.value)" item-end ion-button icon-end color="primary">
+          Set
+          <ion-icon name="add"></ion-icon>
+        </button>
+      </ion-item>
+    </ion-list>
+    <ion-list>
+      <ion-list-header>Edit admins</ion-list-header>
+      <ion-item *ngFor="let user1 of dist.admins">
+        <div *ngIf="user1 != this.user.email">{{ user1 }}</div>
+        <button *ngIf="user1 != this.user.email" (click)="edit($event, 'admin', user1, 'remove')" item-end ion-button icon-end color="danger">
+          Remove
+          <ion-icon name="remove"></ion-icon>
+        </button>
+      </ion-item>
+      <ion-item>
+        <ion-input #admin type="text" placeholder="Add Admin"></ion-input>
+        <button (click)="edit($event, 'admin', admin.value, 'add')" item-end ion-button icon-end color="secondary">
+          Add
+          <ion-icon name="add"></ion-icon>
+        </button>
+      </ion-item>
+    </ion-list>
+    <ion-list>
+      <ion-list-header>Edit schools</ion-list-header>
+      <ion-item *ngFor="let school of dist.schools">
+        {{ school }}
+        <button (click)="edit($event, 'school', school, 'remove')" item-end ion-button icon-end color="danger">
+          Remove
+          <ion-icon name="remove"></ion-icon>
+        </button>
+      </ion-item>
+      <ion-item>
+        <ion-input #school type="text" placeholder="Add School"></ion-input>
+        <button (click)="edit($event, 'school', school.value, 'add')" item-end ion-button icon-end color="secondary">
+          Add
+          <ion-icon name="add"></ion-icon>
+        </button>
+      </ion-item>
+    </ion-list>
+    <ion-list>
+      <ion-list-header>Edit domains</ion-list-header>
+      <ion-item *ngFor="let domain of dist.domains">
+        {{ domain }}
+        <button (click)="edit($event, 'domain', domain, 'remove')" item-end ion-button icon-end color="danger">
+          Remove
+          <ion-icon name="remove"></ion-icon>
+        </button>
+      </ion-item>
+      <ion-item>
+        <ion-input #domain type="text" placeholder="Add Domain"></ion-input>
+        <button (click)="edit($event, 'domain', domain.value, 'add')" item-end ion-button icon-end color="secondary">
+          Add
+          <ion-icon name="add"></ion-icon>
+        </button>
+      </ion-item>
+    </ion-list>
+    <ion-list>
+      <ion-list-header>Edit destinations</ion-list-header>
+      <ion-item *ngFor="let dest of dist.destinations">
+        {{ dest }}
+        <button (click)="edit($event, 'dest', dest, 'remove')" item-end ion-button icon-end color="danger">
+          Remove
+          <ion-icon name="remove"></ion-icon>
+        </button>
+      </ion-item>
+      <ion-item>
+        <ion-input #dest type="text" placeholder="Add Destination"></ion-input>
+        <button (click)="edit($event, 'dest', dest.value, 'add')" item-end ion-button icon-end color="secondary">
+          Add
+          <ion-icon name="add"></ion-icon>
+        </button>
+      </ion-item>
+    </ion-list>
+    <ion-list>
+      <ion-item>
+        <a class="danger" (click)="reset()">Reset passes for your school</a><br><br>
+        <ion-note>Make sure to have a csv backup before resetting.</ion-note>
+      </ion-item>
+    </ion-list>
+    <ion-list>
+      <ion-item>
+        <a class="danger" (click)="startFresh()">Start fresh</a><br><br>
+        <ion-note>Removes all users from your district. Do this every school year to avoid charges for former teachers & students.</ion-note>
+      </ion-item>
+    </ion-list>
   </div>
   
 </ion-content>
@@ -168,6 +298,10 @@
                 Search User
               </ion-segment-button>
             </ion-segment>
+            <ion-buttons end>
+              <button *ngIf="isAdmin && !viewAsAdmin" ion-button (click)="toggleAdmin()">View Admin</button>
+              <button *ngIf="isAdmin && viewAsAdmin" ion-button (click)="toggleAdmin()">View Teacher</button>
+            </ion-buttons>
           </ion-toolbar>
         </ion-footer>
   </div>
