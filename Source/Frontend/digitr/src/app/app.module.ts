@@ -20,7 +20,6 @@ import { GooglePlus } from '../../node_modules/@ionic-native/google-plus';
 import { Push } from '@ionic-native/push';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { AnauserPage } from '../pages/anauser/anauser';
-import { ActivatedRoute } from '@angular/router';
 
 @NgModule({
   declarations: [

@@ -747,7 +747,7 @@ class Responder:
             self.send({'error': 'una'})
             return
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
-        count: int = self.db.users.count({'domain': {'$in': district['domains']}, 'is_teacher': False})
+        count = self.db.users.count({'domain': {'$in': district['domains']}, 'is_teacher': False})
         self.send({'count': count})
 
     def start_payment(self):
