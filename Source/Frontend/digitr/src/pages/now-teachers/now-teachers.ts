@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController, AlertController, Alert, ModalController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController, AlertController, Alert, ModalController, LoadingController } from 'ionic-angular';
 import { ServerconnService } from '../../serverconn.service';
 import { AuthService } from '../../auth.service';
 import { ApprovepassPage } from '../approvepass/approvepass';
@@ -12,6 +12,16 @@ import { AnauserPage } from '../anauser/anauser';
  * See https://ionicframework.com/docs/components/#navigation for more info on
  * Ionic pages and navigation.
  */
+
+function getParameterByName(name, url?) {
+  if (!url) url = window.location.href;
+  name = name.replace(/[\[\]]/g, '\\$&');
+  var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+      results = regex.exec(url);
+  if (!results) return null;
+  if (!results[2]) return '';
+  return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
 
 @IonicPage()
 @Component({
@@ -34,7 +44,14 @@ export class NowTeachersPage {
   filteredStudents;
   stats;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, public modalCtrl: ModalController, public toastCtrl: ToastController, public push: Push) {
+  isAdmin = false;
+  viewAsAdmin = false;
+
+  payment;
+
+  constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, 
+    public modalCtrl: ModalController, public toastCtrl: ToastController, public push: Push, 
+    public loadingCtrl: LoadingController) {
   }
 
   ionViewDidLoad() {
@@ -95,7 +112,35 @@ export class NowTeachersPage {
       } else {
         this.analytics = false
       }
-      console.log(this.analytics)
+      if (this.dist.admins.indexOf(localStorage.getItem('email')) > -1) {
+        this.isAdmin = true;
+        console.log(true)
+        this.a.getPaymentStats().then(st => {
+          this.payment = st;
+        })
+
+        if (getParameterByName('paymentId')) {
+          let loading = this.loadingCtrl.create()
+          loading.present()
+          this.a.execute_payment(getParameterByName('paymentId'), getParameterByName('PayerID')).then(() => {
+            let alert = this.alertCtrl.create({
+              title: "Success!",
+              subTitle: "Your payment was received.",
+              buttons: ['Dismiss']
+            })
+            alert.present()
+            loading.dismiss()
+          }).catch(() => {
+            let alert = this.alertCtrl.create({
+              title: "Error",
+              subTitle: "There was an error processing your payment. Please try again. (No charges were made.)",
+              buttons: ['Dismiss']
+            })
+            alert.present()
+            loading.dismiss()
+          })
+        }
+      }
     })
     this.getAnalytics()
   }
@@ -170,7 +215,12 @@ export class NowTeachersPage {
   }
 
   async getCSV() {
-    let string = await this.a.getCSVTeacher()
+    let string;
+    if (this.viewAsAdmin) {
+      string = await this.a.getCSVAdmin()
+    } else {
+      string = await this.a.getCSVTeacher()
+    }
 
     var a = document.createElement("a");
     document.body.appendChild(a);
@@ -183,4 +233,127 @@ export class NowTeachersPage {
     a.click()
   }
 
+  async toggleAdmin() {
+    if (this.viewAsAdmin) {
+      this.stats = await this.a.getTeacherStats()
+      this.students = await this.a.getTeacherUsers()
+      this.filteredStudents = this.students
+      this.viewAsAdmin = false;
+    } else {
+      this.stats = await this.a.getAdminStats()
+      this.students = await this.a.getAdminUsers()
+      this.filteredStudents = this.students
+      this.viewAsAdmin = true
+    }
+  }
+
+  sendToAll() {
+    let alert = this.alertCtrl.create({
+      title: "Send Message to all",
+      inputs : [
+        {
+          name: 'message',
+          placeholder: 'Message'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancel'
+        },
+        {
+          text: 'Send',
+          handler: data => {
+            this.a.sendMessageToAll(data.message).then(() => {
+              let toast = this.toastCtrl.create({
+                message: "Message was sent.",
+                showCloseButton: true
+              })
+              toast.present()
+            })
+          }
+        }
+      ]
+    })
+    alert.present()
+  }
+
+  async edit(event, field: string, data: string, type?: string) {
+    await this.a.editDistrict(field, data, type)
+    event.target.value = ""
+    this.dist = await this.a.getDistrictInfo()
+    let toast = this.toastCtrl.create({
+      message: "Updated district.",
+      showCloseButton: true
+    })
+    toast.present()
+  }
+
+  async reset() {
+    let alert = this.alertCtrl.create({
+      title: "Are you sure you would like to reset the passes?",
+      subTitle: "This is an irrevocable request.",
+      buttons: [
+        {
+          text: "Yes",
+          cssClass: "danger",
+          handler: () => {
+            this.a.reset_passes().then(() => {
+              let toast = this.toastCtrl.create({
+                message: "Passes reset.",
+                showCloseButton: true
+              })
+              toast.present()
+            })
+          }
+        },
+        {
+          text: "No",
+          role: "cancel"
+        }
+      ]
+    })
+    alert.present()
+  }
+
+  async startFresh() {
+    let alert = this.alertCtrl.create({
+      title: "Are you sure you would like to remove all users?",
+      subTitle: "This is an irrevocable request. All users will have to signin again.",
+      buttons: [
+        {
+          text: "Yes",
+          cssClass: "danger",
+          handler: () => {
+            this.a.start_fresh().then(() => {
+              let toast = this.toastCtrl.create({
+                message: "Users removed.",
+                showCloseButton: true
+              })
+              toast.present()
+            })
+          }
+        },
+        {
+          text: "No",
+          role: "cancel"
+        }
+      ]
+    })
+    alert.present()
+  }
+
+  startPayment() {
+    let loading = this.loadingCtrl.create()
+    loading.present()
+    this.a.start_payment().then(url => {
+      window.location.href = url;
+    }).catch(() => {
+      let alert = this.alertCtrl.create({
+        title: "Error",
+        subTitle: "There was an error processing your payment. Please try again. (No charges were made.)",
+        buttons: ['Dismiss']
+      })
+      alert.present()
+    })
+  }
 }
