@@ -756,7 +756,7 @@ class Responder:
             return
 
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
-        count: int = self.db.users.count({'domain': {'$in': district['domains']}, 'is_teacher': False})
+        count = self.db.users.count({'domain': {'$in': district['domains']}, 'is_teacher': False})
 
         payment = paypalrestsdk.Payment({
                     "intent": "sale",
