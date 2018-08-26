@@ -100,6 +100,8 @@ class Responder:
             self.start_payment()
         if request['request'] == 'execute_payment':
             self.execute_payment()
+        if request['request'] == 'start_trial':
+            self.start_trial_period()
 
     def get_district(self):
         district = self.db.districts.find_one({'domains': {'$in': [self.request['domain']]}})
@@ -748,7 +750,7 @@ class Responder:
             return
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
         count = self.db.users.count({'domain': {'$in': district['domains']}, 'is_teacher': False})
-        self.send({'count': count, 'trial_finished': district.get('trial_finished'), 'trial_start': district.get('trial_start')})
+        self.send({'count': count, 'trial_finished': district.get('trial_finished'), 'trial_start': district.get('trial_start'), 'start': district.get('analytics_start_timestamp')})
 
     def start_payment(self):
         if not self.isAdmin():
@@ -769,7 +771,7 @@ class Responder:
                         "item_list": {
                             "items": [{
                                 "name": "Digitr Analytics",
-                                "sku": "analytics",
+                                "sku": "analytics{}".format(count * 0.5),
                                 "price": "{}".format(count * 0.5),
                                 "currency": "USD",
                                 "quantity": 1}]},
