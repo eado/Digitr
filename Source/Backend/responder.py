@@ -798,6 +798,7 @@ class Responder:
         if payment.execute({"payer_id": self.request['payer_id']}):
             self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'analytics': True}})
             self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'analytics_start_timestamp': datetime.datetime.now()}})
+            self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'trial_finished': True}})
             self.send({'success': True})
         else:
             self.send({'error': 'ppe'})
