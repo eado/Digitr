@@ -69,7 +69,9 @@ def start_payment_service():
 
 if __name__ == '__main__':
     os.system("tput setaf 3")
-    try: 
+    try:
+        p = Thread(target=start_payment_service)
+        p.start()
         start_server()
     except KeyboardInterrupt:
         os.system("tput setaf 7")
