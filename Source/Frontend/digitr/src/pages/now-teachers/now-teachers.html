@@ -188,10 +188,12 @@
       <div *ngIf="!dist.analytics">
           <ion-list-header *ngIf="!dist.analytics"><h1>Analytics not enabled</h1></ion-list-header>
           <ion-item>{{ payment.count }} students are enrolled under this district.</ion-item>
-          <ion-item>Current price to enable Analytics: ${{ payment.count / 2 }} / year. ($0.50 / user)</ion-item>
-          <ion-item><a (click)="startPayment()">Pay for Analytics via PayPal</a></ion-item>
           <ion-item *ngIf="payment.trial_finished">Your 30 day trial has expired.</ion-item>
           <ion-item *ngIf="!payment.trial_finished" (click)="startTrial()"><a>Start 30 day trial</a></ion-item>
+      </div>
+      <div *ngIf="!dist.analytics || (!payment.trial_finished && payment.trial_start)">
+        <ion-item>Current price to enable Analytics: ${{ payment.count / 2 }} / year. ($0.50 / user)</ion-item>
+        <ion-item><a (click)="startPayment()">Pay for Analytics via PayPal</a></ion-item>
       </div>
     </ion-list>
     <ion-list>

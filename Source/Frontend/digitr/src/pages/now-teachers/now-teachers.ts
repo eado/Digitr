@@ -372,4 +372,10 @@ export class NowTeachersPage {
     })
     alert.present()
   }
+
+  duration(timestamp: any, days: number) {
+    timestamp = timestamp.$date
+    let interval = Math.floor(Date.now() / 1000) - Math.floor(timestamp / 1000)
+    return days - Math.floor(interval / 86400)
+  }
 }
