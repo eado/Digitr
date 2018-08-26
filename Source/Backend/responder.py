@@ -761,7 +761,7 @@ class Responder:
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
         count = self.db.users.count({'domain': {'$in': district['domains']}, 'is_teacher': False})
 
-        if district.get('last_payment_count', 0) >= district.get('max_count', 0) and district.get('last_payment_count'):
+        if district.get('last_payment_count', 0) >= district.get('max_count', 0) and not district.get('last_payment_count'):
             payment = paypalrestsdk.Payment({
                         "intent": "sale",
                         "payer": {
