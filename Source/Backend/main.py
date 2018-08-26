@@ -64,7 +64,7 @@ def start_payment_service():
                 count = db.users.count({'domain': {'$in': district['domains']}})
                 db.districts.update({'domains': district['domains']}, {'max_count': count})
         
-        sleep(86400)
+        sleep(1)
 
 
 if __name__ == '__main__':
