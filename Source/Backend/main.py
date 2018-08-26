@@ -53,7 +53,7 @@ def start_payment_service():
                     db.districts.update({'domains': district['domains']}, {'trial_finished': True})
                     db.districts.update({'domains': district['domains']}, {'analytics': False})
             if district.get('analytics_start_timestamp'):
-                days = (now - district['trial_start']) // 86400
+                days = (now - district['analytics_start_timestamp']) // 86400
                 if days > 365:
                     db.districts.update({'domains': district['domains']}, {'analytics': False})
             if district.get('max_count'):
