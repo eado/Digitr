@@ -48,12 +48,12 @@ def start_payment_service():
 
         for district in districts:
             if district.get('trial_start') and (not district.get('trial_finished')):
-                days = (now - district['trial_start']) // 86400
+                days = (now - district['trial_start']) // 8640
                 if days > 30:
                     db.districts.update({'domains': district['domains']}, {'$set': {'trial_finished': True}})
                     db.districts.update({'domains': district['domains']}, {'$set': {'analytics': False}})
             if district.get('analytics_start_timestamp'):
-                days = (now - district['analytics_start_timestamp']) // 86400
+                days = (now - district['analytics_start_timestamp']) // 8640
                 if days > 365:
                     db.districts.update({'domains': district['domains']}, {'$set': {'analytics': False}})
             if district.get('max_count'):
