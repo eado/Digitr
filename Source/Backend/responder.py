@@ -748,7 +748,7 @@ class Responder:
             return
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
         count = self.db.users.count({'domain': {'$in': district['domains']}, 'is_teacher': False})
-        self.send({'count': count})
+        self.send({'count': count, 'trial_finished': district.get('trial_finished'), 'trial_start': district.get('trial_start')})
 
     def start_payment(self):
         if not self.isAdmin():
@@ -799,4 +799,16 @@ class Responder:
             self.send({'success': True})
         else:
             self.send({'error': 'ppe'})
+
+    def start_trial_period(self):
+        if not self.isAdmin():
+            self.send({'error': 'una'})
+            return
+        
+        district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
+        if district.get('trial_finished'):
+            self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'analytics': True}})
+            self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'trial_start': datetime.datetime.now()}})
+
+        self.send({'success': True})
         
