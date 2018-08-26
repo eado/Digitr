@@ -57,11 +57,11 @@ def start_payment_service():
                 if days > 365:
                     db.districts.update({'domains': district['domains']}, {'$set': {'analytics': False}})
             if district.get('max_count'):
-                count = db.users.count({'domain': {'$in': district['domains']}})
+                count = db.users.count({'domain': {'$in': district['domains']}, 'is_teacher': False})
                 if district['max_count'] < count:
                     db.districts.update({'domains': district['domains']}, {'$set': {'max_count': count}})
             else:
-                count = db.users.count({'domain': {'$in': district['domains']}})
+                count = db.users.count({'domain': {'$in': district['domains']}, 'is_teacher': False})
                 db.districts.update({'domains': district['domains']}, {'$set': {'max_count': count}})
         
         sleep(1)

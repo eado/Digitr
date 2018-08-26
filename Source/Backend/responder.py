@@ -831,7 +831,7 @@ class Responder:
             self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'analytics_start_timestamp': datetime.datetime.now().timestamp()}})
             self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'trial_finished': True}})
             self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'trial_start': None}})
-            self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'last_payment_count': self.db.users.count({'domain': {'$in': district['domains']}})}})
+            self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'last_payment_count': self.db.users.count({'domain': {'$in': district['domains']}, 'is_teacher': False})}})
             self.send({'success': True})
         else:
             self.send({'error': 'ppe'})
