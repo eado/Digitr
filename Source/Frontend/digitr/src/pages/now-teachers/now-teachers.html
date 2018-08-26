@@ -190,6 +190,10 @@
           <ion-item>{{ payment.count }} students are enrolled under this district.</ion-item>
           <ion-item *ngIf="payment.trial_finished">Your 30 day trial has expired.</ion-item>
           <ion-item *ngIf="!payment.trial_finished" (click)="startTrial()"><a>Start 30 day trial</a></ion-item>
+          <div *ngIf="payment.max_count && payment.last_payment_count">
+            <ion-item text-wrap *ngIf="payment.max_count > payment.last_payment_count">The maximum number of users you had this year is 
+              {{ payment.max_count }}, but last year, you payed for {{ payment.last_payment_count }}. Your next purchase will include payment for the surplus of {{ payment.max_count - payment.last_payment_count }} users.</ion-item>
+          </div>
       </div>
       <div *ngIf="!dist.analytics || (!payment.trial_finished && payment.trial_start)">
         <ion-item>Current price to enable Analytics: ${{ payment.count / 2 }} / year. ($0.50 / user)</ion-item>
