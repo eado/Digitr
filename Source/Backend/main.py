@@ -47,25 +47,22 @@ def start_payment_service():
         now = datetime.datetime.now().timestamp()
 
         for district in districts:
-            try:
-                if district.get('trial_start') and (not district.get('trial_finished')):
-                    days = (now - district['trial_start']) // 86400
-                    if days > 30:
-                        db.districts.update({'domains': district['domains']}, {'trial_finished': True})
-                        db.districts.update({'domains': district['domains']}, {'analytics': False})
-                if district.get('analytics_start_timestamp'):
-                    days = (now - district['analytics_start_timestamp']) // 86400
-                    if days > 365:
-                        db.districts.update({'domains': district['domains']}, {'analytics': False})
-                if district.get('max_count'):
-                    count = db.users.count({'domain': {'$in': district['domains']}})
-                    if district['max_count'] < count:
-                        db.districts.update({'domains': district['domains']}, {'max_count': count})
-                else:
-                    count = db.users.count({'domain': {'$in': district['domains']}})
-                    db.districts.update({'domains': district['domains']}, {'max_count': count})
-            except:
-                pass
+            if district.get('trial_start') and (not district.get('trial_finished')):
+                days = (now - district['trial_start']) // 86400
+                if days > 30:
+                    db.districts.update({'domains': district['domains']}, {'$set': {'trial_finished': True}})
+                    db.districts.update({'domains': district['domains']}, {'$set': {'analytics': False}})
+            if district.get('analytics_start_timestamp'):
+                days = (now - district['analytics_start_timestamp']) // 86400
+                if days > 365:
+                    db.districts.update({'domains': district['domains']}, {'$set': {'analytics': False}})
+            if district.get('max_count'):
+                count = db.users.count({'domain': {'$in': district['domains']}})
+                if district['max_count'] < count:
+                    db.districts.update({'domains': district['domains']}, {'$set': {'max_count': count}})
+            else:
+                count = db.users.count({'domain': {'$in': district['domains']}})
+                db.districts.update({'domains': district['domains']}, {'$set': {'max_count': count}})
         
         sleep(1)
 
