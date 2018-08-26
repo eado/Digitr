@@ -3,6 +3,7 @@
 import json
 import sys
 import os
+import datetime
 
 from threading import Thread
 
@@ -11,6 +12,8 @@ from websocket_server import WebsocketServer
 from responder import Responder, clients
 
 from pymongo import MongoClient
+
+from time import sleep
 
 mongo_client = MongoClient(port=3232)
 
@@ -35,6 +38,34 @@ def start_server():
     server.set_fn_message_received(message_received)
     server.set_fn_client_left(client_left)
     server.run_forever()
+
+def start_payment_service():
+    db = mongo_client.digitr
+
+    while True:
+        districts = db.districts.find({})
+        now = datetime.datetime.now()
+
+        for district in districts:
+            if district.get('trial_start') and (not district.get('trial_finished')):
+                days = (now - district['trial_start']) // 86400
+                if days > 30:
+                    db.districts.update({'domains': district['domains']}, {'trial_finished': True})
+                    db.districts.update({'domains': district['domains']}, {'analytics': False})
+            if district.get('analytics_start_timestamp'):
+                days = (now - district['trial_start']) // 86400
+                if days > 365:
+                    db.districts.update({'domains': district['domains']}, {'analytics': False})
+            if district.get('max_count'):
+                count = db.users.count({'domain': {'$in': district['domains']}})
+                if district['max_count'] < count:
+                    db.districts.update({'domains': district['domains']}, {'max_count': count})
+            else:
+                count = db.users.count({'domain': {'$in': district['domains']}})
+                db.districts.update({'domains': district['domains']}, {'max_count': count})
+        
+        sleep(86400)
+
 
 if __name__ == '__main__':
     os.system("tput setaf 3")
