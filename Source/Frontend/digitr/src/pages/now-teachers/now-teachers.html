@@ -197,7 +197,7 @@
       </div>
       <div *ngIf="payment.max_count && payment.last_payment_count">
         <ion-item text-wrap *ngIf="payment.max_count > payment.last_payment_count">The maximum number of users you had this year is 
-          {{ payment.max_count }}, but last year, you payed for {{ payment.last_payment_count }}. Your next purchase will include payment for the surplus of {{ payment.max_count - payment.last_payment_count }} users.</ion-item>
+          {{ payment.max_count }}, but last year you payed for {{ payment.last_payment_count }}. Your next purchase will include payment for the surplus of {{ payment.max_count - payment.last_payment_count }} users.</ion-item>
       </div>
     </ion-list>
     <ion-list>
