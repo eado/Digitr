@@ -70,12 +70,21 @@ export class MyApp {
         if (!(localStorage.getItem('signedIn') == "true")) {
           this.rootPage = HomePage
         }
+        let timeout = true;
+
+        setTimeout(() => {
+          if (timeout) {
+            this.rootPage = HomePage
+          }
+        }, 3000)
+
         gapi.load('auth2', () => {
           this.auth2 = gapi.auth2.init({}).then(
             (auth) => {
               if (auth.isSignedIn.get()) {
                 this.a.userExists(localStorage.getItem('email')).then(
                   (exists) => {
+                    timeout = false;
                     if (exists[0]) {
                       if (exists[1]) {
                         this.rootPage = NowTeachersPage;

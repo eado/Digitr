@@ -126,7 +126,10 @@ export class NowTeachersPage {
             let alert = this.alertCtrl.create({
               title: "Success!",
               subTitle: "Your payment was received.",
-              buttons: ['Dismiss']
+              buttons: ['Reload app']
+            })
+            alert.onDidDismiss(() => {
+              location.href = location.href.split("?")[0]
             })
             alert.present()
             loading.dismiss()
@@ -355,5 +358,18 @@ export class NowTeachersPage {
       })
       alert.present()
     })
+  }
+
+  async startTrial() {
+    await this.a.start_trial()
+    let alert = this.alertCtrl.create({
+      title: "Success!",
+      subTitle: "Your trial period has started.",
+      buttons: ["Reload app"]
+    })
+    alert.onDidDismiss(() => {
+      location.href = location.href.split("?")[0]
+    })
+    alert.present()
   }
 }
