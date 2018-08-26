@@ -44,7 +44,7 @@ def start_payment_service():
 
     while True:
         districts = db.districts.find({})
-        now = datetime.datetime.now()
+        now = datetime.datetime.now().timestamp()
 
         for district in districts:
             if district.get('trial_start') and (not district.get('trial_finished')):
