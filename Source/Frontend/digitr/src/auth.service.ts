@@ -527,6 +527,28 @@ export class AuthService {
         })
     }
 
+    async start_trial() {
+        let token;     
+        if (this.plt.is('cordova')) {             
+            token = this.user.idToken       
+        } else {             
+            token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         
+        }
+        return new Promise<string>((r, rej) => {
+            this.scs.add({
+                request: "start_trial",
+                token: token,
+                email: localStorage.getItem('email')
+            }, value => {
+                if (value.error) {
+                    rej()
+                } else {
+                    r()
+                }
+            })
+        })
+    }
+
 
     signout() {
         if (this.plt.is('cordova')) {

@@ -808,7 +808,7 @@ class Responder:
             return
         
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
-        if district.get('trial_finished'):
+        if not district.get('trial_finished'):
             self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'analytics': True}})
             self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'trial_start': datetime.datetime.now()}})
 
