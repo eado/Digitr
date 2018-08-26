@@ -750,7 +750,8 @@ class Responder:
             return
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
         count = self.db.users.count({'domain': {'$in': district['domains']}, 'is_teacher': False})
-        self.send({'count': count, 'trial_finished': district.get('trial_finished'), 'trial_start': district.get('trial_start'), 'start': district.get('analytics_start_timestamp')})
+        self.send({'count': count, 'trial_finished': district.get('trial_finished'), 'trial_start': district.get('trial_start'), 
+                   'start': district.get('analytics_start_timestamp'), 'max_count': district.get('max_count'), 'last_payment_count': district.get('last_payment_count')})
 
     def start_payment(self):
         if not self.isAdmin():
@@ -760,25 +761,53 @@ class Responder:
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
         count = self.db.users.count({'domain': {'$in': district['domains']}, 'is_teacher': False})
 
-        payment = paypalrestsdk.Payment({
-                    "intent": "sale",
-                    "payer": {
-                        "payment_method": "paypal"},
-                    "redirect_urls": {
-                        "return_url": "http://localhost:8100/",
-                        "cancel_url": "http://localhost:8100/"},
-                    "transactions": [{
-                        "item_list": {
-                            "items": [{
-                                "name": "Digitr Analytics",
-                                "sku": "analytics{}".format(count * 0.5),
-                                "price": "{}".format(count * 0.5),
-                                "currency": "USD",
-                                "quantity": 1}]},
-                        "amount": {
-                            "total": "{}".format(count * 0.5),
-                            "currency": "USD"},
-                        "description": "Payment for {} users for one year.".format(count)}]})
+        if district.get('last_payment_count', 0) >= district.get('max_count', 0):
+            payment = paypalrestsdk.Payment({
+                        "intent": "sale",
+                        "payer": {
+                            "payment_method": "paypal"},
+                        "redirect_urls": {
+                            "return_url": "http://localhost:8100/",
+                            "cancel_url": "http://localhost:8100/"},
+                        "transactions": [{
+                            "item_list": {
+                                "items": [{
+                                    "name": "Digitr Analytics",
+                                    "sku": "analytics{}{}".format(count * 0.5, district['domains'][0]),
+                                    "price": "{}".format(count * 0.5),
+                                    "currency": "USD",
+                                    "quantity": 1}]},
+                            "amount": {
+                                "total": "{}".format(count * 0.5),
+                                "currency": "USD"},
+                            "description": "Payment for {} users for one year.".format(count)}]})
+        else:
+            payment = paypalrestsdk.Payment({
+                        "intent": "sale",
+                        "payer": {
+                            "payment_method": "paypal"},
+                        "redirect_urls": {
+                            "return_url": "http://localhost:8100/",
+                            "cancel_url": "http://localhost:8100/"},
+                        "transactions": [{
+                            "item_list": {
+                                "items": [{
+                                    "name": "Digitr Analytics",
+                                    "sku": "analytics{}{}".format(count * 0.5, district['domains'][0]),
+                                    "price": "{}".format(count * 0.5),
+                                    "currency": "USD",
+                                    "quantity": 1},
+
+                                    {"name": "Digitr Analytics Payback",
+                                    "sku": "analyticspayback{}{}".format((district['max_count'] - district['last_payment_count']) * 0.5, district['domains'][0]),
+                                    "price": "{}".format((district['max_count'] - district['last_payment_count']) * 0.5),
+                                    "currency": "USD",
+                                    "quantity": 1}
+                                    ]},
+                            "amount": {
+                                "total": "{}".format(count * 0.5 + (district['max_count'] - district['last_payment_count']) * 0.5),
+                                "currency": "USD"},
+                            "description": "Payment for {} users for one year and surplus users from last payment ({}).".format(count, (district['max_count'] - district['last_payment_count']))}]})
 
         if payment.create():
             for link in payment.links:
@@ -795,10 +824,14 @@ class Responder:
         
         payment = paypalrestsdk.Payment.find(self.request['payment_id'])
 
+        district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
+
         if payment.execute({"payer_id": self.request['payer_id']}):
             self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'analytics': True}})
             self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'analytics_start_timestamp': datetime.datetime.now().timestamp()}})
             self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'trial_finished': True}})
+            self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'trial_start': None}})
+            self.db.districts.update({'domains': self.request['email'].split('@')[1]}, {'$set': {'last_payment_count': self.db.users.count({'domain': {'$in': district['domains']}})}})
             self.send({'success': True})
         else:
             self.send({'error': 'ppe'})
