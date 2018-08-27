@@ -21,7 +21,7 @@ export class AnauserPage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, public toastCtrl: ToastController) {
     this.user = navParams.get('user')
-    this.history = history;
+    this.history = this.user.history;
   }
 
   ionViewDidLoad() {
