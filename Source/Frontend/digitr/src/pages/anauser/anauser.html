@@ -23,8 +23,8 @@
 
 
 <ion-content padding>
-  <div *ngIf="user.history">
-    <div *ngIf="user.history.length < 1">
+  <div *ngIf="history">
+    <div *ngIf="history.length < 1">
         <h1 class="nohistory">No history available</h1>
     </div>
     <ion-list no-border no-lines *ngFor="let pass of user.history">
