@@ -15,7 +15,7 @@ from apns import APNs, Payload
 
 PAYPAL_CLIENT_ID = "AZk1bqqyC2FutRRHRb7ej_jKsZHsvGD-8aSm29mj-7znJYVQvNtQHoIq2j3qWdeQlxJ6ypY3LkpXMqtC"
 PAYPAL_SECRET = "EF-F_ZocEC30OhS5rL5HtoiZW-vE1jnpMEewFvE3lmiGLhTW-Lrm-cRmHJvnDp3OS4mgJuzDj-dMDcW4"
-PAYPAL_MODE = "sandbox"
+PAYPAL_MODE = "live"
 
 CLIENT_ID = "1089587494564-2ntl0ugt0d8e7cm8muclg0b81e5aj91h.apps.googleusercontent.com"
 CLIENT_ID_2 = "1089587494564-63vl8kls1v7jc3qlgrmn087ponappo6q.apps.googleusercontent.com"
@@ -767,8 +767,8 @@ class Responder:
                         "payer": {
                             "payment_method": "paypal"},
                         "redirect_urls": {
-                            "return_url": "http://localhost:8100/",
-                            "cancel_url": "http://localhost:8100/"},
+                            "return_url": "https://app.digitrapp.com",
+                            "cancel_url": "https://app.digitrapp.com"},
                         "transactions": [{
                             "item_list": {
                                 "items": [{
@@ -787,8 +787,8 @@ class Responder:
                         "payer": {
                             "payment_method": "paypal"},
                         "redirect_urls": {
-                            "return_url": "http://localhost:8100/",
-                            "cancel_url": "http://localhost:8100/"},
+                            "return_url": "https://app.digitrapp.com",
+                            "cancel_url": "https://app.digitrapp.com/"},
                         "transactions": [{
                             "item_list": {
                                 "items": [{
