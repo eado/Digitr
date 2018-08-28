@@ -13,8 +13,8 @@ from time import sleep
 from apns import APNs, Payload
 
 
-PAYPAL_CLIENT_ID = "AZk1bqqyC2FutRRHRb7ej_jKsZHsvGD-8aSm29mj-7znJYVQvNtQHoIq2j3qWdeQlxJ6ypY3LkpXMqtC"
-PAYPAL_SECRET = "EF-F_ZocEC30OhS5rL5HtoiZW-vE1jnpMEewFvE3lmiGLhTW-Lrm-cRmHJvnDp3OS4mgJuzDj-dMDcW4"
+PAYPAL_CLIENT_ID = "AS6YpvUZqnBBUFRy_YxcqXMl1sV1OAmuUlkf8iW6ll-HS3yZmntixfhWRD7Y7toAe4bAxQxksRwBtQpp"
+PAYPAL_SECRET = "ELVmUaMQiRR6rPcZBX7tHGhWTqtPzQayEkvXBsuIysKYoDH8mrgZOSQziw7lbQn8Jz6CEAGYBSSTMTMw"
 PAYPAL_MODE = "live"
 
 CLIENT_ID = "1089587494564-2ntl0ugt0d8e7cm8muclg0b81e5aj91h.apps.googleusercontent.com"
