@@ -5,6 +5,7 @@ import { AuthService } from '../../auth.service';
 import { ApprovepassPage } from '../approvepass/approvepass';
 import { PushOptions, Push } from '@ionic-native/push';
 import { AnauserPage } from '../anauser/anauser';
+import { MessagePage } from '../message/message';
 
 /**
  * Generated class for the NowTeachersPage page.
@@ -251,33 +252,19 @@ export class NowTeachersPage {
   }
 
   sendToAll() {
-    let alert = this.alertCtrl.create({
-      title: "Send Message to all",
-      inputs : [
-        {
-          name: 'message',
-          placeholder: 'Message'
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancel'
-        },
-        {
-          text: 'Send',
-          handler: data => {
-            this.a.sendMessageToAll(data.message).then(() => {
-              let toast = this.toastCtrl.create({
-                message: "Message was sent.",
-                showCloseButton: true
-              })
-              toast.present()
-            })
-          }
-        }
-      ]
-    })
-    alert.present()
+    let modal = this.modalCtrl.create(MessagePage, {name: "all"});
+    modal.onDidDismiss((value => {
+      if (value) {
+        this.a.sendMessageToAll(value.text).then(() => {
+          let toast = this.toastCtrl.create({
+            message: "Message was sent.",
+            showCloseButton: true
+          })
+          toast.present()
+        })
+      }
+    }))
+    modal.present()
   }
 
   async edit(event, field: string, data: string, type?: string) {
