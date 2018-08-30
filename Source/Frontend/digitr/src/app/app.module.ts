@@ -20,6 +20,7 @@ import { GooglePlus } from '../../node_modules/@ionic-native/google-plus';
 import { Push } from '@ionic-native/push';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { AnauserPage } from '../pages/anauser/anauser';
+import { MessagePage } from '../pages/message/message';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { AnauserPage } from '../pages/anauser/anauser';
     TeachersPage,
     ApprovepassPage,
     TimerPage,
-    AnauserPage
+    AnauserPage,
+    MessagePage
   ],
   imports: [
     BrowserModule,
@@ -57,7 +59,8 @@ import { AnauserPage } from '../pages/anauser/anauser';
     TeachersPage,
     ApprovepassPage,
     TimerPage,
-    AnauserPage
+    AnauserPage,
+    MessagePage
   ],
   providers: [
     StatusBar,

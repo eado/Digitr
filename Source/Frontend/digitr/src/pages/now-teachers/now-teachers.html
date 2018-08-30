@@ -67,7 +67,7 @@
     </ion-list>
   </div>
   <div *ngIf="currentPage == 'analytics'">
-      <h1 class="nohistory" *ngIf="!analytics">Analytics is not enabled by your administrator.</h1>
+      <h1 class="nohistory" *ngIf="!analytics">Analytics is not enabled. <br> Please refer to your administrator.</h1>
       <div *ngIf="analytics">
         <div *ngIf="analyticsPage == 'stats'">
           <ion-grid>
@@ -287,7 +287,7 @@
     <ion-list>
       <ion-item>
         <a class="danger" (click)="startFresh()">Start fresh</a><br><br>
-        <ion-note>Removes all users from your district. Do this every school year to avoid charges for former teachers & students.</ion-note>
+        <ion-note>Removes all users from your district. We recommend to do this every school year to avoid charges for former teachers & students.</ion-note>
       </ion-item>
     </ion-list>
   </div>

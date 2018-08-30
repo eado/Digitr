@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, ToastController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, ToastController, Modal, ModalController } from 'ionic-angular';
 import { AuthService } from '../../auth.service';
+import { MessagePage } from '../message/message';
 
 /**
  * Generated class for the AnauserPage page.
@@ -19,7 +20,7 @@ export class AnauserPage {
 
   history;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, public toastCtrl: ToastController) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, public toastCtrl: ToastController, public modalCtrl: ModalController) {
     this.user = navParams.get('user')
     this.history = this.user.history;
   }
@@ -54,34 +55,19 @@ export class AnauserPage {
     }
   }
   send() {
-    let alert = this.alertCtrl.create({
-      title: "Send Message",
-      message: "to " + this.user.name,
-      inputs : [
-        {
-          name: 'message',
-          placeholder: 'Message'
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancel'
-        },
-        {
-          text: 'Send',
-          handler: data => {
-            this.a.sendMessage(this.user.email, data.message).then(() => {
-              let toast = this.toastCtrl.create({
-                message: "Message to " + this.user.name + " was sent.",
-                showCloseButton: true
-              })
-              toast.present()
-            })
-          }
-        }
-      ]
-    })
-    alert.present()
+    let modal = this.modalCtrl.create(MessagePage, {name: this.user.name});
+    modal.onDidDismiss((value => {
+      if (value) {
+        this.a.sendMessage(this.user.name, value.text).then(() => {
+          let toast = this.toastCtrl.create({
+            message: "Message to " + this.user.name + " was sent.",
+            showCloseButton: true
+          })
+          toast.present()
+        })
+      }
+    }))
+    modal.present()
   }
 
 }
