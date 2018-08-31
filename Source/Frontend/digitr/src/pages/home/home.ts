@@ -11,12 +11,11 @@ import { GooglePlus } from '../../../node_modules/@ionic-native/google-plus';
   templateUrl: 'home.html'
 })
 export class HomePage {
+  microsoftApp;
+
+  token = null;
 
   constructor(public navCtrl: NavController, private a: AuthService, public alertCtrl: AlertController, public plt: Platform, public googlePlus: GooglePlus) {
-    
-  }
-
-  ionViewDidAppear() {
   }
 
   async signin() {
@@ -104,6 +103,10 @@ export class HomePage {
       modal.present();
       user.disconnect();
     }
+  }
+
+  async microsoftsignin() {
+    this.a.msLogin()
   }
 
 }
