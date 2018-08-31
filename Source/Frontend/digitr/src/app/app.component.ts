@@ -30,68 +30,45 @@ export class MyApp {
       statusBar.styleDefault()
 
       splashScreen.hide();
-      if (platform.is('cordova')) {
-        so.unlock()
-        console.log('ios')
-        this.googlePlus.trySilentLogin({
-          scopes: 'profile email',
-          offline: false
-        }).then(
-          (user) => {
-            if (user) {
-              this.a.user = user;
-              this.a.userExists(localStorage.getItem('email')).then(
-                (exists) => {
-                  if (exists[0]) {
-                    if (exists[1]) {
-                      this.rootPage = NowTeachersPage;
-                    } else {
-                      this.rootPage = NowStudentsPage;
-                    }
-                    this.a.serverSignin(user.idToken)
-                  } else {
-                    this.rootPage = StartPage;
-                  }
-                  splashScreen.hide();
-                }
-              )
+
+      if (localStorage.getItem('microsoft')) {
+        this.a.msLoginCallback = () => {
+          this.a.getMsData().then(value => {
+            if (value.user_exists) {
+              if (value.is_teacher) {
+                this.rootPage = NowTeachersPage
+              } else {
+                this.rootPage = NowStudentsPage
+              }
             } else {
-              this.rootPage = HomePage;
-              splashScreen.hide()
+              this.rootPage = StartPage
             }
-          }
-        ).catch(
-          () => {
-            this.rootPage = HomePage;
-            splashScreen.hide()
-          }
-        )
-      } else {
-        if (!(localStorage.getItem('signedIn') == "true")) {
-          this.rootPage = HomePage
+            localStorage.setItem('signedIn', "true")
+            localStorage.setItem('name', value.displayName)
+            localStorage.setItem('email', value.userPrincipalName)
+          })
         }
-        let timeout = true;
-
-        setTimeout(() => {
-          if (timeout) {
-            this.rootPage = HomePage
-          }
-        }, 3000)
-
-        gapi.load('auth2', () => {
-          this.auth2 = gapi.auth2.init({}).then(
-            (auth) => {
-              if (auth.isSignedIn.get()) {
+        this.a.msCallback()
+      } else {
+        if (platform.is('cordova')) {
+          so.unlock()
+          console.log('ios')
+          this.googlePlus.trySilentLogin({
+            scopes: 'profile email',
+            offline: false
+          }).then(
+            (user) => {
+              if (user) {
+                this.a.user = user;
                 this.a.userExists(localStorage.getItem('email')).then(
                   (exists) => {
-                    timeout = false;
                     if (exists[0]) {
                       if (exists[1]) {
                         this.rootPage = NowTeachersPage;
                       } else {
                         this.rootPage = NowStudentsPage;
                       }
-                      this.a.serverSignin(auth.currentUser.get().getAuthResponse().id_token)
+                      this.a.serverSignin(user.idToken)
                     } else {
                       this.rootPage = StartPage;
                     }
@@ -103,8 +80,52 @@ export class MyApp {
                 splashScreen.hide()
               }
             }
+          ).catch(
+            () => {
+              this.rootPage = HomePage;
+              splashScreen.hide()
+            }
           )
-        });
+        } else {
+          if (!(localStorage.getItem('signedIn') == "true")) {
+            this.rootPage = HomePage
+          }
+          let timeout = true;
+  
+          setTimeout(() => {
+            if (timeout) {
+              this.rootPage = HomePage
+            }
+          }, 3000)
+  
+          gapi.load('auth2', () => {
+            this.auth2 = gapi.auth2.init({}).then(
+              (auth) => {
+                if (auth.isSignedIn.get()) {
+                  this.a.userExists(localStorage.getItem('email')).then(
+                    (exists) => {
+                      timeout = false;
+                      if (exists[0]) {
+                        if (exists[1]) {
+                          this.rootPage = NowTeachersPage;
+                        } else {
+                          this.rootPage = NowStudentsPage;
+                        }
+                        this.a.serverSignin(auth.currentUser.get().getAuthResponse().id_token)
+                      } else {
+                        this.rootPage = StartPage;
+                      }
+                      splashScreen.hide();
+                    }
+                  )
+                } else {
+                  this.rootPage = HomePage;
+                  splashScreen.hide()
+                }
+              }
+            )
+          });
+        }
       }
     });
   }

@@ -11,6 +11,7 @@ from pymongo import MongoClient
 from bson.json_util import dumps
 from time import sleep
 from apns import APNs, Payload
+from requests import request
 
 
 PAYPAL_CLIENT_ID = "AS6YpvUZqnBBUFRy_YxcqXMl1sV1OAmuUlkf8iW6ll-HS3yZmntixfhWRD7Y7toAe4bAxQxksRwBtQpp"
@@ -102,6 +103,25 @@ class Responder:
             self.execute_payment()
         if request['request'] == 'start_trial':
             self.start_trial_period()
+        if request['request'] == 'get_ms_data':
+            self.get_ms_data()
+    
+    def get_ms_data(self):
+        response = request("GET", "https://graph.microsoft.com/v1.0/me", 
+                                    headers={'Authorization': self.request['token']})
+        jsonresp = json.loads(response.text)
+
+        user = self.db.users.find_one({'email': jsonresp['userPrincipalName']})
+
+        if user:
+            jsonresp['user_exists'] = True
+            jsonresp['is_teacher'] = user['is_teacher']
+
+            self.send(jsonresp)
+        else:
+            jsonresp['user_exists'] = False
+            
+            self.send(jsonresp)
 
     def get_district(self):
         district = self.db.districts.find_one({'domains': {'$in': [self.request['domain']]}})
@@ -136,6 +156,16 @@ class Responder:
             self.send({'success': True, 'user_exists': False})
 
     def verify_user(self):
+        if (self.request.get('ms')):
+            response = request("GET", "https://graph.microsoft.com/v1.0/me", 
+                                    headers={'Authorization': self.request['token']})
+            jsonresp = json.loads(response.text)
+
+            if jsonresp['userPrincipalName'] == self.request['email']:
+                return True
+            else:
+                return False
+
         try:
             idinfo = id_token.verify_oauth2_token(self.request['token'], requests.Request(), CLIENT_ID)
 

@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { ToastController } from "../node_modules/ionic-angular";
 import { checkAndUpdateBinding } from "../node_modules/@angular/core/src/view/util";
 
-const URL = "wss://server.digitrapp.com:9001";
+const URL = "wss://home.omarelamri.me:9001";
 
 @Injectable()
 export class ServerconnService {
@@ -58,6 +58,9 @@ export class ServerconnService {
     add(data: any, callback: ((any) => void)) {
         let identifier = this._generateIdentifier();
         data.request_id = identifier;
+        if (localStorage.getItem('microsoft')) {
+            data.ms = true;
+        }
         this._callbacks.push([identifier, callback]);
         if (this._ws.readyState == this._ws.OPEN) {
             this._ws.send(JSON.stringify(data));
