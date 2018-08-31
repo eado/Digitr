@@ -16,6 +16,9 @@ export class HomePage {
   token = null;
 
   constructor(public navCtrl: NavController, private a: AuthService, public alertCtrl: AlertController, public plt: Platform, public googlePlus: GooglePlus) {
+    this.a.msLoginCallback = () => {
+      location = location
+    }
   }
 
   async signin() {
