@@ -660,14 +660,14 @@ class Responder:
                     text += (passs['teacher'] + ',')
                     text += (str(passs['minutes']) + ',')
 
-                    timestamp = datetime.datetime.fromtimestamp(
+                    timestamp = (datetime.datetime.fromtimestamp(
                                     passs['timestamp']
-                                ).strftime('%Y-%m-%d %H:%M:%S')
+                                ) - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')
                     text += (timestamp + ',')
 
-                    timestamp_end = datetime.datetime.fromtimestamp(
+                    timestamp_end = (datetime.datetime.fromtimestamp(
                                         passs['timestamp_end']
-                                    ).strftime('%Y-%m-%d %H:%M:%S')
+                                    ) - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')
                     text += (timestamp_end + ',')
                     text += ('\n')
         self.send({'csv_data': text})
@@ -679,7 +679,7 @@ class Responder:
         admin = self.db.users.find_one({'email': self.request['email']})
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
         usersRef = self.db.users.find({'domain': {'$in': district['domains']}}, {'history': True, 'name': True})
-        text = "User,Pass,Destination,Teacher,Minutes,Timestamp,End Time\n"
+        text = "User,Pass,Destination,Teacher,Minutes,Timestamp(EST),End Time(EST)\n"
 
         for user in usersRef:
             for passs in user['history']:
@@ -691,14 +691,14 @@ class Responder:
                     text += (passs['teacher'] + ',')
                     text += (str(passs['minutes']) + ',')
 
-                    timestamp = datetime.datetime.fromtimestamp(
+                    timestamp = (datetime.datetime.fromtimestamp(
                                     passs['timestamp']
-                                ).strftime('%Y-%m-%d %H:%M:%S')
+                                ) - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')
                     text += (timestamp + ',')
 
-                    timestamp_end = datetime.datetime.fromtimestamp(
+                    timestamp_end = (datetime.datetime.fromtimestamp(
                                         passs['timestamp_end']
-                                    ).strftime('%Y-%m-%d %H:%M:%S')
+                                    ) - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')
                     text += (timestamp_end + ',')
                     text += ('\n')
                     
