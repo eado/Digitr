@@ -649,7 +649,7 @@ class Responder:
             return
         teacher = self.db.users.find_one({'email': self.request['email']})
         usersRef = self.db.users.find({'history.teacher': teacher['name']}, {'history': True, 'name': True})
-        text = "User,Pass,Destination,Teacher,Minutes,Timestamp,End Time\n"
+        text = "User,Pass,Destination,Teacher,Minutes,Timestamp(EST),End Time(EST)\n"
 
         for user in usersRef:
             for passs in user['history']:
