@@ -729,7 +729,14 @@ class Responder:
             if self.request['type'] == 'remove':
                 self.db.districts.update(query, {'$pull': {'schools': self.request['data']}})
             elif self.request['type'] == 'add':
-                self.db.districts.update(query, {'$push': {'schools': self.request['data']}})
+                if self.db.districts.find_one(query).get('schools'):
+                    if self.request['type'] == 'remove':
+                        self.db.districts.update(query, {'$pull': {'schools': self.request['data']}})
+                    elif self.request['type'] == 'add':
+                        self.db.districts.update(query, {'$push': {'schools': self.request['data']}})
+                else:
+                    self.db.districts.update(query, {'$set': {'schools': [self.request['data']]}})
+                
         elif self.request['field'] == 'domain':
             if self.request['type'] == 'remove':
                 self.db.districts.update(query, {'$pull': {'domains': self.request['data']}})
