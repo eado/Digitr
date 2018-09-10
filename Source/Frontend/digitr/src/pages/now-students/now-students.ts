@@ -28,6 +28,7 @@ export class NowStudentsPage {
   currentPage = "now"
   
   user;
+  messagesDisplayed = [];
   districtInfo;
 
   passesRemaining;
@@ -67,17 +68,16 @@ export class NowStudentsPage {
 
     console.log('ionViewDidLoad NowStudentsPage');
     this.a.getUser(localStorage.getItem('email'), (user) => {
+      if (user.messages && this.first) {
+        for (let message of user.messages) {
+          this.messagesDisplayed.push(message.timestamp)
+        }
+      }
       if (!this.first && user.messages) {
         user.messages = (user.messages as any[]).reverse()
+
         for (let message of user.messages) {
-          let isNew = true
-          for (let message2 of this.user.messages) {
-            isNew = message.timestamp != message2.timestamp
-          }
-          if (Date.now() / 1000 - message.timestamp > 300) {
-            this.dismiss(message.timestamp)
-          }
-          if (isNew) {
+          if (this.messagesDisplayed.indexOf(message.timestamp) < 0) {
             let alert = this.alertCtrl.create({
               title: message.title,
               subTitle: message.subTitle,
@@ -91,6 +91,7 @@ export class NowStudentsPage {
               ]
             })
             alert.present()
+            this.messagesDisplayed.push(message.timestamp)
           }
         }
       }
