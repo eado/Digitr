@@ -35,6 +35,8 @@ export class NowTeachersPage {
   user;
   district;
 
+  messagesDisplayed = [];
+
   currentPage = "messages"
   analyticsPage = "stats"
 
@@ -73,17 +75,16 @@ export class NowTeachersPage {
     
     console.log('ionViewDidLoad NowTeachersPage');
     this.a.getUser(localStorage.getItem('email'), (user) => {
+      if (user.messages && this.first) {
+        for (let message of user.messages) {
+          this.messagesDisplayed.push(message.timestamp)
+        }
+      }
       if (!this.first && user.messages) {
         user.messages = (user.messages as any[]).reverse()
+
         for (let message of user.messages) {
-          let isNew = true
-          for (let message2 of this.user.messages) {
-            isNew = message.timestamp != message2.timestamp
-          }
-          if (Date.now() / 1000 - message.timestamp > 300) {
-            this.dismiss(message.timestamp)
-          }
-          if (isNew) {
+          if (this.messagesDisplayed.indexOf(message.timestamp) < 0) {
             let alert = this.alertCtrl.create({
               title: message.title,
               subTitle: message.subTitle,
@@ -100,6 +101,7 @@ export class NowTeachersPage {
             if (message.type == "pass_done") {
               this.playSound()
             }
+            this.messagesDisplayed.push(message.timestamp)
           }
         }
       }
