@@ -145,7 +145,7 @@ class Responder:
 
         self.send({'schools': district["schools"], 'pass': district['pass'], 
                    'teachers': district['teachers'], 'destinations': district.get('destinations'), 
-                   'teachers_with_names': teachers_with_names, 'admins': district["admins"], 'analytics': district.get('analytics'), 'domains': district['domains']})
+                   'teachers_with_names': teachers_with_names, 'admins': district["admins"], 'analytics': district.get('analytics'), 'domains': district['domains'], 'legacy': district.get('legacy')})
 
     def user_exists(self):
         user = self.db.users.find_one({'email': self.request['email']})
@@ -347,6 +347,10 @@ class Responder:
         user = self.db.users.find_one({'email': self.request['email']})
         district = self.db.districts.find_one({'domains': {'$in': [self.request['email'].split('@')[1]]}})
         
+        if district.get('legacy'):
+            self.approve_pass(True)
+            return
+
         new_history = []
         for passs in user['history']:
             if passs['name'] != 'Free':
@@ -393,29 +397,35 @@ class Responder:
         self.db.users.update_one({'email': self.request['email']}, {'$pull': {'messages': {'timestamp': self.request['message_time']}}})
         self.send({"success": True})
 
-    def approve_pass(self):
+    
+
+    def approve_pass(self, legacy=False):
         if not self.verify_user():
             self.send({'error': 'uns'})
             return
 
         district = self.db.districts.find_one({'domains': {'$in': [self.request['email'].split('@')[1]]}})
-        teacher = self.db.users.find_one({'email': self.request['email']})
+        
+        teacher = self.db.users.find_one({'email': self.request['email']}) if not legacy else self.db.users.find_one({'email': self.request['user']})
 
-        user = self.db.users.find_one({'email': self.request['user']}) 
+        user = self.db.users.find_one({'email': self.request['user']}) if not legacy else self.db.users.find_one({'email': self.request['email']})
 
         new_history = []
         for passs in user['history']:
             if passs['name'] != 'Free':
                 new_history.append(passs)
 
-        name = 'Free' if self.request['free'] else int(district['pass']) - len(new_history)        
+        if legacy:
+            name = int(district['pass']) - len(new_history)
+        else:
+            name = 'Free' if self.request['free'] else int(district['pass']) - len(new_history)        
 
         timestamp = datetime.datetime.now().timestamp()
         self.db.users.update_one({'email': self.request['user']}, {'$push': {'history': {
-            'destination': self.request['destination'],
+            'destination': self.request['destination'] if not legacy else self.request['dest'],
             'teacher': teacher['name'],
             'timestamp': timestamp,
-            'minutes': self.request['minutes'],
+            'minutes': self.request['minutes'] if not legacy else 5,
             'name': name
         }}})
 
@@ -424,16 +434,16 @@ class Responder:
             'email': teacher['email'],
             'type': 'pass_approved',
             'title': 'Pass Approved',
-            'subTitle': 'Your request to go to the {} was approved. You have {} minutes. The timer starts now.'.format(self.request['destination'], self.request['minutes']),
+            'subTitle': 'Your request to go to the {} was approved. You have {} minutes. The timer starts now.'.format(self.request['destination'] if not legacy else self.request['dest'], self.request['minutes'] if not legacy else 5),
             'timestamp': timestamp,
-            'minutes': self.request['minutes'],
+            'minutes': self.request['minutes'] if not legacy else 5,
             'name': name
         }
 
-        self.send_message(message, [self.request['user']])
+        self.send_message(message, [self.request['user'] if not legacy else self.request['email']])
         self.send({'success': True})
         
-        sleep(int(self.request['minutes'] * 60))
+        sleep(int((self.request['minutes'] if not legacy else 5) * 60))
         user = self.db.users.find_one({'email': self.request['user']})
         history = user['history']
         for passs in history:
@@ -450,7 +460,7 @@ class Responder:
             'timestamp': timestamp2,
             'pass_time': timestamp,
             'name': name
-        }, [self.request['user']])
+        }, [self.request['user'] if not legacy else self.request['email']])
 
         self.send_message({
             'user': user['name'],
@@ -461,7 +471,7 @@ class Responder:
             'timestamp': timestamp2,
             'pass_time': timestamp,
             'name': name
-        }, [self.request['email']])
+        }, [self.request['email'] if not legacy else self.request['user']])
 
     def back_from_pass(self):
         if not self.verify_user():
@@ -750,6 +760,11 @@ class Responder:
                     self.db.districts.update(query, {'$push': {'destinations': self.request['data']}})
             else:
                 self.db.districts.update(query, {'$set': {'destinations': [self.request['data']]}})
+        elif self.request['field'] == 'legacy':
+            if self.request['data'] == True:
+                self.db.districts.update(query, {'$set': {'legacy': True}})
+            else:
+                self.db.districts.update(query, {'$set': {'legacy': False}})
         
         self.send({'success': True})
 

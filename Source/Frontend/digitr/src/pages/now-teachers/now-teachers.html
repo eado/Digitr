@@ -279,6 +279,13 @@
       </ion-item>
     </ion-list>
     <ion-list>
+      <ion-list-header>Legacy Mode</ion-list-header>
+      <ion-item>
+        <ion-label>Turn on Legacy Mode: Students can approve passes without teacher consent.</ion-label>
+        <ion-toggle #legacy [checked]="dist.legacy" (click)="edit($event, 'legacy', legacy.checked)"></ion-toggle>
+      </ion-item>
+    </ion-list>
+    <ion-list>
       <ion-item>
         <a class="danger" (click)="reset()">Reset passes for your school</a><br><br>
         <ion-note>Make sure to have a csv backup before resetting.</ion-note>
