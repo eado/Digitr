@@ -421,7 +421,7 @@ class Responder:
             name = 'Free' if self.request['free'] else int(district['pass']) - len(new_history)        
 
         timestamp = datetime.datetime.now().timestamp()
-        self.db.users.update_one({'email': self.request['user']}, {'$push': {'history': {
+        self.db.users.update_one({'email': self.request['user'] if not legacy else self.request['email']}, {'$push': {'history': {
             'destination': self.request['destination'] if not legacy else self.request['dest'],
             'teacher': teacher['name'],
             'timestamp': timestamp,
