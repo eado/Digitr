@@ -368,9 +368,8 @@ class Responder:
             'pass': passes_left
         }
 
-        self.send_message(message, [self.request['user']])
-
         self.send({"success": True})
+        self.send_message(message, [self.request['user']])
 
     def deny_pass(self):
         if not self.verify_user():
@@ -387,8 +386,9 @@ class Responder:
             'timestamp': datetime.datetime.now().timestamp()
         }
 
-        self.send_message(message, [self.request['user']])
         self.send({"success": True})
+
+        self.send_message(message, [self.request['user']])
 
     def dismiss_message(self):
         if not self.verify_user():
@@ -440,8 +440,9 @@ class Responder:
             'name': name
         }
 
-        self.send_message(message, [self.request['user'] if not legacy else self.request['email']])
         self.send({'success': True})
+
+        self.send_message(message, [self.request['user'] if not legacy else self.request['email']])
         
         sleep(int((self.request['minutes'] if not legacy else 5) * 60))
         user = self.db.users.find_one({'email': self.request['user']})
@@ -480,6 +481,8 @@ class Responder:
         self.db.users.update_one({'email': self.request['email'], 'history.timestamp': self.request['timestamp']}, 
                                  {'$set': {'history.$.timestamp_end': datetime.datetime.now().timestamp()}})
         user = self.db.users.find_one({'email': self.request['email']})
+        self.send({'success': True})
+
         self.send_message({
             'user': user['name'],
             'email': user['email'],
@@ -488,7 +491,6 @@ class Responder:
             'subTitle': "{} is back.".format(user['name']),
             'timestamp': datetime.datetime.now().timestamp()
         }, [self.request['teacher']])
-        self.send({'success': True})
 
     def set_notification(self):
         if not self.verify_user():
