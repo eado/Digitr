@@ -128,7 +128,7 @@ class Responder:
         if not district:
             self.send({'exists': False})
         else:
-            self.send({'exists': True, 'schools': district["schools"]})
+            self.send({'exists': True, 'schools': district["schools"], 'teachers_enabled': district.get("teachers_enabled")})
 
     def get_district_info(self):
         if not self.verify_user():
@@ -145,7 +145,8 @@ class Responder:
 
         self.send({'schools': district["schools"], 'pass': district['pass'], 
                    'teachers': district['teachers'], 'destinations': district.get('destinations'), 
-                   'teachers_with_names': teachers_with_names, 'admins': district["admins"], 'analytics': district.get('analytics'), 'domains': district['domains'], 'legacy': district.get('legacy')})
+                   'teachers_with_names': teachers_with_names, 'admins': district["admins"], 'analytics': district.get('analytics'), 
+                   'domains': district['domains'], 'legacy': district.get('legacy'), 'teachers_enabled': district.get("teachers_enabled")})
 
     def user_exists(self):
         user = self.db.users.find_one({'email': self.request['email']})
@@ -235,10 +236,16 @@ class Responder:
             school = None
 
         domain = self.request['email'].split("@")[1]
+        district = self.db.districts.find_one({'domains': domain})
 
         if not self.verify_user():
             self.send({'error': 'uns'})
             return
+
+        if self.request['is_teacher'] and not (district.get("teachers_enabled", True)):
+            self.send({'error': 'tne'})
+            return
+
         self.db.users.insert_one({
             'name': self.request['name'],
             'email': self.request['email'],
@@ -767,6 +774,11 @@ class Responder:
                 self.db.districts.update(query, {'$set': {'legacy': True}})
             else:
                 self.db.districts.update(query, {'$set': {'legacy': False}})
+        elif self.request['field'] == 'teachers_enabled':
+            if self.request['data'] == True:
+                self.db.districts.update(query, {'$set': {'teachers_enabled': True}})
+            else:
+                self.db.districts.update(query, {'$set': {'teachers_enabled': False}})
         
         self.send({'success': True})
 

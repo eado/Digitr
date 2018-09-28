@@ -23,8 +23,9 @@
     <br>
     <p *ngIf="!districtExists && studentClicked">Sorry, but your school {{ domain }} doesn't seem to be using Digitr. <br> Refer your teacher/administrator to this <a href="http://digitrapp.com">site</a>.</p>
     <p *ngIf="districtExists && studentClicked">Your school {{ domain }} uses Digitr! <br> <button ion-button (click)="addStudent()">Start using Digitr</button></p>
-    <p *ngIf="districtExists && teacherClicked && !(schools.length > 0)">Your district {{ domain }} uses Digitr! <br> <button ion-button (click)="addTeacher()">Start using Digitr</button></p>
-    <div *ngIf="districtExists && teacherClicked && (schools.length > 0)">Your district {{ domain }} uses Digitr! 
+    <p *ngIf="districtExists && teacherClicked && !teachers_enabled">Teachers are not enabled for your school. Contact your adminstrator.</p>
+    <p *ngIf="districtExists && teacherClicked && !(schools.length > 0) && teachers_enabled">Your district {{ domain }} uses Digitr! <br> <button ion-button (click)="addTeacher()">Start using Digitr</button></p>
+    <div *ngIf="districtExists && teacherClicked && (schools.length > 0) && teachers_enabled">Your district {{ domain }} uses Digitr! 
       <br> Which school do you teach at? 
       <div *ngFor="let s of schools">
         <h4 *ngIf="this.school == s" class="active" (click)="this.school = s">{{ s }} <ion-icon name="checkmark-circle"></ion-icon></h4>
