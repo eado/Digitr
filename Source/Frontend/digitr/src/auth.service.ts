@@ -98,12 +98,16 @@ export class AuthService {
         })
     }
 
-    async getDistrictAndSchools(): Promise<[boolean, string[]]> {
+    async getDistrictAndSchools(): Promise<[boolean, string[], boolean]> {
         let domain = localStorage.getItem('email').split('@')[1];
 
-        return new Promise<[boolean, string[]]>((resolve, _) => {
+        return new Promise<[boolean, string[], boolean]>((resolve, _) => {
             this.scs.add({request: 'get_district', domain: domain}, (value) => {
-                resolve([value.exists, value.schools])
+                let t_e = true;
+                if (value.teachers_enabled == false) {
+                    t_e = false;
+                }
+                resolve([value.exists, value.schools, t_e])
             });
         })
     }

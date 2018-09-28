@@ -31,6 +31,8 @@ export class StartPage {
 
   pass = 0;
 
+  teachers_enabled = true;
+
   constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public modalCtrl: ModalController, public alertCtrl: AlertController) {
     this.domain = localStorage.getItem('email').split('@')[1];
     this.domains.push(this.domain);
@@ -55,6 +57,9 @@ export class StartPage {
     let val = await this.a.getDistrictAndSchools();
     this.districtExists = val[0];
     this.schools = val[1];
+    if (val['2'] == false) {
+      this.teachers_enabled = false;
+    }
   }
 
   async teacher() {

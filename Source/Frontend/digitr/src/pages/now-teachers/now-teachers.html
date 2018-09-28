@@ -286,6 +286,14 @@
       </ion-item>
     </ion-list>
     <ion-list>
+      <ion-list-header>Teacher Sign Up</ion-list-header>
+      <ion-item>
+        <ion-label>Disable new teachers from signing in.</ion-label>
+        <ion-toggle #legacy *ngIf="dist.teachers_enabled == null" [checked]="false" (click)="edit($event, 'teachers_enabled', !(legacy.checked))"></ion-toggle>
+        <ion-toggle #legacy *ngIf="dist.teachers_enabled != null" [checked]="!dist.teachers_enabled" (click)="edit($event, 'teachers_enabled', !(legacy.checked))"></ion-toggle>
+      </ion-item>
+    </ion-list>
+    <ion-list>
       <ion-item>
         <a class="danger" (click)="reset()">Reset passes for your school</a><br><br>
         <ion-note>Make sure to have a csv backup before resetting.</ion-note>
