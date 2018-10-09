@@ -562,7 +562,7 @@ class Responder:
                     if not passs.get('timestamp_end'):
                         currently_out.append(passs['user'])
                     if passs.get('timestamp_end'):
-                        intervals += passs['timestamp_end'] - passs['timestamp']
+                        intervals += passs.get('timestamp_end', passs['timestamp']) - passs['timestamp']
                     minutesTotal += passs['minutes']
 
         if len(passes) < 1:
@@ -613,7 +613,7 @@ class Responder:
                     if not passs.get('timestamp_end'):
                         currently_out.append(passs['user'])
                     if passs.get('timestamp_end'):
-                        intervals += passs['timestamp_end'] - passs['timestamp']
+                        intervals += passs.get('timestamp_end', passs['timestamp']) - passs['timestamp']
                     minutesTotal += passs['minutes']
         
         if len(passes) < 1:
@@ -685,7 +685,7 @@ class Responder:
                     text += (timestamp + ',')
 
                     timestamp_end = (datetime.datetime.fromtimestamp(
-                                        passs['timestamp_end']
+                                        passs.get('timestamp_end', passs['timestamp'])
                                     ) - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')
                     text += (timestamp_end + ',')
                     text += ('\n')
@@ -716,7 +716,7 @@ class Responder:
                     text += (timestamp + ',')
 
                     timestamp_end = (datetime.datetime.fromtimestamp(
-                                        passs['timestamp_end']
+                                        passs.get('timestamp_end', passs['timestamp'])
                                     ) - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')
                     text += (timestamp_end + ',')
                     text += ('\n')
