@@ -5,6 +5,8 @@ import os
 import sys
 import paypalrestsdk
 
+from multiprocessing import Process
+
 from google.auth.transport import requests
 from google.oauth2 import id_token
 from pymongo import MongoClient
@@ -92,7 +94,8 @@ class Responder:
         if request['request'] == 'edit_district':
             self.edit_district()
         if request['request'] == 'reset_passes':
-            self.reset_passes()
+            process = Process(target=self.reset_passes)
+            process.start()
         if request['request'] == 'start_fresh':
             self.start_fresh()
         if request['request'] == 'get_payment_stats':
