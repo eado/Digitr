@@ -193,7 +193,7 @@
       </div>
       <div *ngIf="!dist.analytics || (!payment.trial_finished && payment.trial_start)">
         <ion-item>Current price to enable Analytics: ${{ payment.count / 2 }} / year. ($0.50 / user)</ion-item>
-        <ion-item><a (click)="startPayment()">Pay for Analytics via PayPal</a></ion-item>
+        <ion-item><a (click)="startPayment()" *ngIf="avail">Pay for Analytics via PayPal</a></ion-item>
       </div>
       <div *ngIf="payment.max_count && payment.last_payment_count">
         <ion-item text-wrap *ngIf="payment.max_count > payment.last_payment_count">The maximum number of users you had this year is 

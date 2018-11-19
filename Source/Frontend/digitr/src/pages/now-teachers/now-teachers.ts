@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController, AlertController, Alert, ModalController, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController, AlertController, Alert, ModalController, LoadingController, Platform } from 'ionic-angular';
 import { ServerconnService } from '../../serverconn.service';
 import { AuthService } from '../../auth.service';
 import { ApprovepassPage } from '../approvepass/approvepass';
@@ -52,9 +52,12 @@ export class NowTeachersPage {
 
   payment;
 
+  avail;
+
   constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, 
     public modalCtrl: ModalController, public toastCtrl: ToastController, public push: Push, 
-    public loadingCtrl: LoadingController) {
+    public loadingCtrl: LoadingController, public plt: Platform) {
+      this.avail = !plt.is("cordova");
   }
 
   ionViewDidLoad() {
