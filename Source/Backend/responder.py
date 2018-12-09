@@ -15,6 +15,9 @@ from time import sleep
 from apns import APNs, Payload
 from requests import request
 
+from email.mime.text import MIMEText
+from smtplib import SMTP_SSL as SMTP
+
 
 PAYPAL_CLIENT_ID = "AS6YpvUZqnBBUFRy_YxcqXMl1sV1OAmuUlkf8iW6ll-HS3yZmntixfhWRD7Y7toAe4bAxQxksRwBtQpp"
 PAYPAL_SECRET = "ELVmUaMQiRR6rPcZBX7tHGhWTqtPzQayEkvXBsuIysKYoDH8mrgZOSQziw7lbQn8Jz6CEAGYBSSTMTMw"
@@ -290,6 +293,26 @@ class Responder:
         })
 
         self.send({'success': True})
+        self.send_email("{} signed up with Digitr!".format(self.request['email']))
+
+    def send_email(self, message):
+        msg = MIMEText(message, 'plain')
+        msg['Subject'] = "Someone signed up with Digitr"
+
+        user = "ebelamri@yahoo.com"
+        msg['To'] = user
+
+        try:
+            conn = SMTP('smtp.gmail.com')
+            conn.login("info@digitrapp.com", "Adilemi1971")
+
+            try: 
+                conn.sendmail(user, user, msg.as_string())
+            finally:
+                conn.close()
+        except:
+            os.system("cd ~/ && touch failed.txt")
+
 
     def get_user(self):
         if not self.verify_user():
