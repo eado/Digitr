@@ -299,7 +299,7 @@ class Responder:
         msg = MIMEText(message, 'plain')
         msg['Subject'] = "Someone signed up with Digitr"
 
-        user = "ebelamri@yahoo.com"
+        user = "info@digitrapp.com"
         msg['To'] = user
 
         try:
