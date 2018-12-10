@@ -390,12 +390,18 @@ class Responder:
                 new_history.append(passs)
 
         passes_left = int(district['pass']) - len(new_history)
+        passes_used_by_set_teacher = 0
+
+        for passs in new_history:
+            if passs['teacher'] == user['name']:
+                passes_used_by_set_teacher += 1
+
         message = {
             'user': user['name'],
             'email': self.request['email'],
             'type': 'pass_request',
             'title': 'Pass Request',
-            'subTitle': '{} would like to use a pass to go to the {}. This user has {} passes left.'.format(user['name'], self.request['dest'], passes_left),
+            'subTitle': '{} would like to use a pass to go to the {}. This user has {} passes left. (You have approved {} passes to this user.)'.format(user['name'], self.request['dest'], passes_left, passes_used_by_set_teacher),
             'destination': self.request['dest'],
             'timestamp': datetime.datetime.now().timestamp(),
             'pass': passes_left
