@@ -76,6 +76,10 @@ class Responder:
             self.back_from_pass()
         if request['request'] == 'set_notification':
             self.set_notification()
+        if request['request'] == 'clear_messages':
+            self.clear_messages()
+        if request['request'] == 'send_everyone_back':
+            self.send_everyone_back()
         if request['request'] == 'get_teacher_stats':
             self.get_teacher_stats()
         if request['request'] == 'get_teacher_users':
@@ -564,6 +568,29 @@ class Responder:
             return
         self.send({'users': self.db.users.distinct("name", {"is_teacher": False, "domain": {"$in": district['domains']}, "history.teacher": user['name']})})
 
+    def clear_messages(self):
+        if not self.verify_user():
+            self.send({'error': 'uns'})
+            return
+
+        self.db.users.update({'email': self.request['email']}, {'$set': {'messages': []}})
+        self.send({'success': True})
+
+    def send_everyone_back(self):
+        if not self.verify_user():
+            self.send({'error': 'uns'})
+            return
+
+        user = self.db.users.find_one({'email': self.request['email']})
+        district = self.db.districts.find_one({'domains': {"$in": [user["domain"]]}})
+
+        self.db.users.update_many({'domain': {'$in': district["domains"]}}, 
+                            {'$set': {"history.$[element].timestamp_end": datetime.datetime.now().timestamp()}}, 
+                            False, [{'$and': [{"element.teacher": user["name"]}, {"element.timestamp_end": None}]}])
+
+        self.send({"success": True})
+
+    
     def get_teacher_stats(self):
         if not self.verify_user():
             self.send({'error': 'uns'})

@@ -365,6 +365,21 @@ export class NowTeachersPage {
     alert.present()
   }
 
+  async clearMessages() {
+    await this.a.clear_messages()
+  }
+
+  async sendBack() {
+    await this.a.send_everyone_back()
+
+    let alert = this.alertCtrl.create({
+      title: "All outstanding students are marked as back.",
+      buttons: ["Dismiss"]
+    })
+
+    alert.present();
+  }
+
   duration(timestamp: number, days: number) {
     let interval = Math.floor(Date.now() / 1000) - timestamp
     return days - Math.floor(interval / 86400)

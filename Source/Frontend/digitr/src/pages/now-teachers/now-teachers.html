@@ -331,3 +331,16 @@
         </ion-footer>
   </div>
 </div>
+
+<div *ngIf="currentPage == 'messages'">
+  <ion-footer>
+    <ion-toolbar>
+      <ion-buttons start>
+        <button ion-button (click)="clearMessages()">Clear all messages</button>
+      </ion-buttons>
+      <ion-buttons end>
+        <button ion-button (click)="sendBack()">Send all students back</button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-footer>
+</div>

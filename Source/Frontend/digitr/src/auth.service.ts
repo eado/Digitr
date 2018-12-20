@@ -458,6 +458,38 @@ export class AuthService {
         })
     }
 
+    async send_everyone_back() {
+        return new Promise<string>((r, rej) => {
+            this.scs.add({
+                request: "send_everyone_back",
+                token: this.getToken(),
+                email: localStorage.getItem('email')
+            }, value => {
+                if (value.error) {
+                    rej()
+                } else {
+                    r()
+                }
+            })
+        })
+    }
+
+    async clear_messages() {
+        return new Promise<string>((r, rej) => {
+            this.scs.add({
+                request: "clear_messages", 
+                token: this.getToken(),
+                email: localStorage.getItem('email')
+            }, value => {
+                if (value.error) {
+                    rej()
+                } else {
+                    r()
+                }
+            })
+        })
+    }
+
 
     signout() {
         if (localStorage.getItem('microsoft')) {
