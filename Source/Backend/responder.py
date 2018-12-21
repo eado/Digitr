@@ -383,10 +383,6 @@ class Responder:
         
         user = self.db.users.find_one({'email': self.request['email']})
         district = self.db.districts.find_one({'domains': {'$in': [self.request['email'].split('@')[1]]}})
-        
-        if district.get('legacy'):
-            self.approve_pass(True)
-            return
 
         new_history = []
         for passs in user['history']:
@@ -399,6 +395,14 @@ class Responder:
         for passs in new_history:
             if passs['teacher'] == user['name']:
                 passes_used_by_set_teacher += 1
+
+        if district.get('legacy'):
+            if passes_left > 0:
+                self.approve_pass(True)
+                return
+            else:
+                self.send({"error": "nnp"})
+                return
 
         message = {
             'user': user['name'],
