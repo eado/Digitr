@@ -96,7 +96,7 @@ export class MyApp {
             if (timeout) {
               this.rootPage = HomePage
             }
-          }, 3000)
+          }, 2000)
   
           gapi.load('auth2', () => {
             this.auth2 = gapi.auth2.init({}).then(

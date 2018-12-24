@@ -20,9 +20,13 @@ export class AnauserPage {
 
   history;
 
+  isAdmin = false;
+
   constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, public toastCtrl: ToastController, public modalCtrl: ModalController) {
     this.user = navParams.get('user')
     this.history = this.user.history;
+
+    this.isAdmin = navParams.get('isAdmin')
   }
 
   ionViewDidLoad() {
@@ -68,6 +72,17 @@ export class AnauserPage {
       }
     }))
     modal.present()
+  }
+
+  async removePass(timestamp) {
+    await this.a.purge_pass(timestamp, this.user.email);
+
+    let alert = this.alertCtrl.create({
+      title: "Pass was removed successfully.",
+      buttons: ["Dismiss"]
+    })
+
+    alert.present()
   }
 
 }

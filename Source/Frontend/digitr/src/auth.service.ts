@@ -490,6 +490,24 @@ export class AuthService {
         })
     }
 
+    async purge_pass(timestamp: Number, user: String) {
+        return new Promise<string>((r, rej) => {
+            this.scs.add({
+                request: "purge_pass", 
+                token: this.getToken(),
+                email: localStorage.getItem('email'),
+                timestamp: timestamp,
+                user: user
+            }, value => {
+                if (value.error) {
+                    rej()
+                } else {
+                    r()
+                }
+            })
+        })
+    }
+
 
     signout() {
         if (localStorage.getItem('microsoft')) {
