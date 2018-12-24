@@ -80,6 +80,8 @@ class Responder:
             self.clear_messages()
         if request['request'] == 'send_everyone_back':
             self.send_everyone_back()
+        if request['request'] == 'purge_pass':
+            self.purge_pass()
         if request['request'] == 'get_teacher_stats':
             self.get_teacher_stats()
         if request['request'] == 'get_teacher_users':
@@ -444,7 +446,25 @@ class Responder:
         self.db.users.update_one({'email': self.request['email']}, {'$pull': {'messages': {'timestamp': self.request['message_time']}}})
         self.send({"success": True})
 
-    
+    def purge_pass(self):
+        if not self.isAdmin():
+            self.send({'error': 'una'})
+            return
+
+        district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
+
+        domains = district['domains']
+
+        user = self.db.users.find_one({'email': self.request['user'], 'domain': {'$in': domains}})
+
+        for passs in user['history']:
+            if passs['timestamp'] == self.request['timestamp']:
+                user['history'].remove(passs)
+
+        self.db.users.update({'email': self.request['user'], 'domain': {'$in': domains}}, {'$set': {'history': user['history']}})
+
+        self.send({'success': True})
+        
 
     def approve_pass(self, legacy=False):
         if not self.verify_user():

@@ -219,7 +219,7 @@ export class NowTeachersPage {
     console.log(user1)
     let user = await this.a.getUserFromName(user1)
 
-    let modal = this.modalCtrl.create(AnauserPage, {user: user.user})
+    let modal = this.modalCtrl.create(AnauserPage, {user: user.user, isAdmin: this.isAdmin})
     modal.present()
   }
 
