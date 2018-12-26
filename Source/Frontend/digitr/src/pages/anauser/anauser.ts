@@ -62,7 +62,7 @@ export class AnauserPage {
     let modal = this.modalCtrl.create(MessagePage, {name: this.user.name});
     modal.onDidDismiss((value => {
       if (value) {
-        this.a.sendMessage(this.user.name, value.text).then(() => {
+        this.a.sendMessage(this.user.email, value.text).then(() => {
           let toast = this.toastCtrl.create({
             message: "Message to " + this.user.name + " was sent.",
             showCloseButton: true
