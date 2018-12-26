@@ -370,7 +370,7 @@ class Responder:
         for email in users:
             self.db.users.update_one({'email': email}, {'$push': {'messages': message}})
             user = self.db.users.find_one({'email': email})
-            if {'user': user['email'], 'message': message['timestamp']} not in nots_sent:
+            if {'user': email, 'message': message['timestamp']} not in nots_sent:
                 for noti in user['notifications']:
                     if noti['type'] == 'ios':
                         apns = APNs(use_sandbox=True, cert_file="crt.pem", key_file='key.pem')
@@ -477,6 +477,8 @@ class Responder:
 
         user = self.db.users.find_one({'email': self.request['user']}) if not legacy else self.db.users.find_one({'email': self.request['email']})
 
+        useruser = self.db.users.find_one({'email': self.request['user']})
+
         new_history = []
         for passs in user['history']:
             if passs['name'] != 'Free':
@@ -531,11 +533,11 @@ class Responder:
         }, [self.request['user'] if not legacy else self.request['email']])
 
         self.send_message({
-            'user': user['name'],
-            'email': user['email'],
+            'user': useruser['name'],
+            'email': useruser['email'],
             'type': 'pass_done',
             'title': "Time's up",
-            'subTitle': "{}'s pass time is over.".format(user['name']),
+            'subTitle': "{}'s pass time is over.".format(useruser['name']),
             'timestamp': timestamp2,
             'pass_time': timestamp,
             'name': name
