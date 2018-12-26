@@ -191,6 +191,10 @@ export class NowStudentsPage {
     }
   }
 
+  clearMessages() {
+    this.a.clear_messages();
+  }
+
   signout() {
     this.a.signout()
   }

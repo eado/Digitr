@@ -369,7 +369,6 @@ class Responder:
     def send_message(self, message, users):
         for email in users:
             self.db.users.update_one({'email': email}, {'$push': {'messages': message}})
-            print(email)
             user = self.db.users.find_one({'email': email})
             if {'user': email, 'message': message['timestamp']} not in nots_sent:
                 for noti in user.get('notifications'):
@@ -478,8 +477,6 @@ class Responder:
 
         user = self.db.users.find_one({'email': self.request['user']}) if not legacy else self.db.users.find_one({'email': self.request['email']})
 
-        useruser = self.db.users.find_one({'email': self.request['user']})
-
         new_history = []
         for passs in user['history']:
             if passs['name'] != 'Free':
@@ -534,11 +531,11 @@ class Responder:
         }, [self.request['user'] if not legacy else self.request['email']])
 
         self.send_message({
-            'user': useruser['name'],
-            'email': useruser['email'],
+            'user': user['name'],
+            'email': user['email'],
             'type': 'pass_done',
             'title': "Time's up",
-            'subTitle': "{}'s pass time is over.".format(useruser['name']),
+            'subTitle': "{}'s pass time is over.".format(user['name']),
             'timestamp': timestamp2,
             'pass_time': timestamp,
             'name': name
