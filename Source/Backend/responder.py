@@ -371,7 +371,7 @@ class Responder:
             self.db.users.update_one({'email': email}, {'$push': {'messages': message}})
             user = self.db.users.find_one({'email': email})
             if {'user': email, 'message': message['timestamp']} not in nots_sent:
-                for noti in user['notifications']:
+                for noti in user.get('notifications'):
                     if noti['type'] == 'ios':
                         apns = APNs(use_sandbox=True, cert_file="crt.pem", key_file='key.pem')
                         payload = Payload(alert="{}: {}".format(message['title'], message['subTitle']), sound="default", mutable_content=True)
