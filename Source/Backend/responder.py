@@ -511,7 +511,7 @@ class Responder:
 
         self.send_message(message, [self.request['user'] if not legacy else self.request['email']])
         
-        sleep(int((self.request['minutes'] if not legacy else 1) * 60))
+        sleep(int((self.request['minutes'] if not legacy else 5) * 60))
         user = self.db.users.find_one({'email': self.request['user']})
         history = user['history']
         for passs in history:
