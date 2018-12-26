@@ -531,8 +531,8 @@ class Responder:
         }, [self.request['user'] if not legacy else self.request['email']])
 
         self.send_message({
-            'user': user['name'],
-            'email': user['email'],
+            'user': user['name'] if not legacy else teacher['name'],
+            'email': user['email'] if not legacy else teacher['email'],
             'type': 'pass_done',
             'title': "Time's up",
             'subTitle': "{}'s pass time is over.".format(user['name']),
