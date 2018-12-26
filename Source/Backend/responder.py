@@ -369,6 +369,7 @@ class Responder:
     def send_message(self, message, users):
         for email in users:
             self.db.users.update_one({'email': email}, {'$push': {'messages': message}})
+            print(email)
             user = self.db.users.find_one({'email': email})
             if {'user': email, 'message': message['timestamp']} not in nots_sent:
                 for noti in user.get('notifications'):
