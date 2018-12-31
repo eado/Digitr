@@ -6,6 +6,7 @@ import os
 import datetime
 
 from multiprocessing import Process
+from threading import Thread
 
 from websocket_server import WebsocketServer
  
@@ -23,9 +24,8 @@ def message_received(client, server, message):
         def start_responder(client, server, message):
             Responder(client, server, message)
 
-        p = Process(target=start_responder, args=(client, server, message))
+        p = Thread(target=start_responder, args=(client, server, message))
         p.start()
-        p.join()
     except json.JSONDecodeError as e:
         server.send_message(client, 'Invalid request. {}'.format(e))
     except KeyError as e:
@@ -72,7 +72,7 @@ def start_payment_service():
 if __name__ == '__main__':
     os.system("tput setaf 3")
     try:
-        p = Process(target=start_payment_service)
+        p = Thread(target=start_payment_service)
         p.start()
         start_server()
     except KeyboardInterrupt:
