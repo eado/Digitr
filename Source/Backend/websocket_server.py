@@ -166,7 +166,7 @@ class WebSocketHandler(StreamRequestHandler):
 
     def __init__(self, socket, addr, server):
         self.server = server
-		socket = ssl.wrap_socket(socket, server_side=True, certfile='/etc/letsencrypt/live/home.omarelamri.me/fullchain.pem', keyfile='/etc/letsencrypt/live/home.omarelamri.me/privkey.pem')
+        socket = ssl.wrap_socket(socket, server_side=True, certfile='/etc/letsencrypt/live/home.omarelamri.me/fullchain.pem', keyfile='/etc/letsencrypt/live/home.omarelamri.me/privkey.pem')
 		StreamRequestHandler.__init__(self, socket, addr, server)
 
     def setup(self):
