@@ -15,6 +15,8 @@ from pymongo import MongoClient
 
 from time import sleep
 
+mongo_client = MongoClient(port=3232)
+
 
 def message_received(client, server, message):
     try:
