@@ -25,6 +25,7 @@ def message_received(client, server, message):
 
         p = Process(target=start_responder, args=(client, server, message))
         p.start()
+        p.join()
     except json.JSONDecodeError as e:
         server.send_message(client, 'Invalid request. {}'.format(e))
     except KeyError as e:
