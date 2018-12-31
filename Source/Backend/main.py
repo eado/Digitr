@@ -5,7 +5,7 @@ import sys
 import os
 import datetime
 
-from threading import Thread
+from multiprocessing import Process
 
 from websocket_server import WebsocketServer
  
@@ -23,7 +23,7 @@ def message_received(client, server, message):
         def start_responder(client, server, message, mc):
             Responder(client, server, message, mc)
 
-        p = Thread(target=start_responder, args=(client, server, message, mongo_client))
+        p = Process(target=start_responder, args=(client, server, message, mongo_client))
         p.start()
     except json.JSONDecodeError as e:
         server.send_message(client, 'Invalid request. {}'.format(e))
