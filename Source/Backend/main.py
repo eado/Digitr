@@ -15,15 +15,13 @@ from pymongo import MongoClient
 
 from time import sleep
 
-mongo_client = MongoClient(port=3232)
-
 
 def message_received(client, server, message):
     try:
-        def start_responder(client, server, message, mc):
-            Responder(client, server, message, mc)
+        def start_responder(client, server, message):
+            Responder(client, server, message)
 
-        p = Process(target=start_responder, args=(client, server, message, mongo_client))
+        p = Process(target=start_responder, args=(client, server, message))
         p.start()
     except json.JSONDecodeError as e:
         server.send_message(client, 'Invalid request. {}'.format(e))

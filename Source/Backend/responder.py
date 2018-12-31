@@ -40,15 +40,18 @@ class Responder:
     client = None 
     request = None
     db = None
+    mongo_client = None
 
-    def __init__(self, client, server, message, mongo_client):
+    def __init__(self, client, server, message):
         self.server = server
         self.client = client
+
+        self.mongo_client = MongoClient(port=3232)
 
         request = json.loads(message)
         self.request = request
 
-        self.db = mongo_client.digitr
+        self.db = self.mongo_client.digitr
 
         if request['request'] == 'signin':
             self.signin()
