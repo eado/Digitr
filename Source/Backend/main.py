@@ -18,7 +18,6 @@ from time import sleep
 mongo_client = MongoClient(port=3232)
 
 
-sys.settrace()
 def message_received(client, server, message):
     try:
         def start_responder(client, server, message, mc):
