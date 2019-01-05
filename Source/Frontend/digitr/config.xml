@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.eaideasllc.NewDigitr" version="3.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.eaideasllc.NewDigitr" version="3.1.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Digitr</name>
     <description>Tap it. Time it. Count it.</description>
     <author email="info@mpassapp.com" href="https://digitrapp.com/">Eaideas, LLC</author>
-    <content src="index.html" />
+    <content original-src="index.html" src="http://10.0.1.72:8101" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />

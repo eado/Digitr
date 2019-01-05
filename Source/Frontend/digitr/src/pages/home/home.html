@@ -1,10 +1,9 @@
 
 
 <ion-content>
-  <img class="backgroundimage" src="assets/bg-old.png" />
-  <h1 class="center">Sign In to continue</h1>
-  
-  
-  <img id="signin" class="signinbutton" (click)="signin()" src="assets/signinbutton.png"/>
-  <div class="signinbutton microsoft" *ngIf="!this.plt.is('cordova')" (click)="microsoftsignin()">Sign in with Microsoft</div>
+  <div class="middle">
+    <h1>Digitr</h1>
+      <div id="signin" class="signinbutton microsoft" (click)="signin()">Sign in with Google</div>
+      <div class="signinbutton microsoft" *ngIf="!this.plt.is('cordova')" (click)="microsoftsignin()">Sign in with Microsoft</div>
+  </div>
 </ion-content>
