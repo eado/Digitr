@@ -1,33 +1,57 @@
 page-home {
-    .backgroundimage {
-        z-index: -10;
-        width: 100%;
-        height: 100%;
-        position: fixed;
-        object-fit: cover;
-        opacity: 0.5
-    }
-    .center {
-        margin: auto;
-        text-align: center;
-        padding-top: 40vh;
-        font-weight: normal;
+
+    ion-content {
+        background-image: url("../assets/bg-old.png");
+        background-size: cover;
+        background-position: center;
     }
     .signinbutton {
         margin: auto;
-        width: 10%;
+        width: 70%;
         object-fit: contain;
         display: block;
-        min-width: 200px;
-        margin-top: 20px;
+        margin-top: 5%;
     }
     .microsoft {
         text-align: center;
-        color: rgb(117, 117, 117);
+        color: $primary;
         background-color: white;
-        box-shadow: 1px 1px 5px #aaaaaa;
         padding: 10px;
-        border-radius: 2px;
+        border-radius: 100px;
         font-weight: bold;
+
+        border: 5px solid $primary; 
+    }
+
+    .middle {
+        position: static;
+        margin: auto;
+        background-color: white;
+        box-shadow: 0px 0px 20px #555555;
+        padding: 10px;
+        border-radius: 10px;
+
+        width: 40%;
+        height: 50%;
+        margin-top: 25vh;
+
+        opacity: 0.95;
+
+        * {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 5em;
+            margin-bottom: 10%;
+            color: $primary;
+        }
+
+    }
+
+    @media screen and (max-width: 768px) {
+        .middle {
+            width: 90%;
+        }
     }
 }

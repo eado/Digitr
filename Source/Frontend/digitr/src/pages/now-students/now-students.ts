@@ -2,12 +2,14 @@ declare var require: any;
 var ProgressBar = require('progressbar.js')
 
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ModalController, ToastController, AlertController, Platform } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController, ToastController, AlertController, Platform, MenuController } from 'ionic-angular';
 import { AuthService } from '../../auth.service';
 import { ServerconnService } from '../../serverconn.service';
 import { TeachersPage } from '../teachers/teachers';
 import { TimerPage } from '../timer/timer';
 import { Push, PushOptions } from '@ionic-native/push'
+import { MyApp } from '../../app/app.component';
+import { WhatsnewPage } from '../whatsnew/whatsnew';
 
 /**
  * Generated class for the NowStudentsPage page.
@@ -42,10 +44,18 @@ export class NowStudentsPage {
 
   circle;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public modalCtrl: ModalController, private scs: ServerconnService, public toastCtrl: ToastController, public alertCtrl: AlertController, public push: Push, public plt: Platform) {
+  local_version = MyApp.LOCAL_VERSION;
+
+  constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public modalCtrl: ModalController, private scs: ServerconnService, public toastCtrl: ToastController, public alertCtrl: AlertController, public push: Push, public plt: Platform, public menu: MenuController) {
   }
 
   async ionViewDidLoad() {
+
+    if (localStorage.getItem("latestVersion") != this.local_version) {
+      let modal = this.modalCtrl.create(WhatsnewPage);
+      modal.present();
+    }
+
     this.circle = new ProgressBar.Circle('#passCircle', {
       color: '#EC6C4D',
       strokeWidth: 5,
@@ -197,6 +207,17 @@ export class NowStudentsPage {
 
   signout() {
     this.a.signout()
+  }
+
+  openMenu() {
+    this.menu.open()
+  }
+
+  getCurrentPage(): String { 
+    if (this.currentPage == 'usepass') {
+      return "Use Pass"
+    }
+    return this.currentPage.charAt(0).toUpperCase() + this.currentPage.slice(1);
   }
 
 }

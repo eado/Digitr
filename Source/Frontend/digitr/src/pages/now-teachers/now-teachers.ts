@@ -1,11 +1,13 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController, AlertController, Alert, ModalController, LoadingController, Platform } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController, AlertController, Alert, ModalController, LoadingController, Platform, MenuController } from 'ionic-angular';
 import { ServerconnService } from '../../serverconn.service';
 import { AuthService } from '../../auth.service';
 import { ApprovepassPage } from '../approvepass/approvepass';
 import { PushOptions, Push } from '@ionic-native/push';
 import { AnauserPage } from '../anauser/anauser';
 import { MessagePage } from '../message/message';
+import { MyApp } from '../../app/app.component';
+import { WhatsnewPage } from '../whatsnew/whatsnew';
 
 /**
  * Generated class for the NowTeachersPage page.
@@ -54,20 +56,28 @@ export class NowTeachersPage {
 
   avail;
 
+  local_version = MyApp.LOCAL_VERSION;
+
   constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, 
     public modalCtrl: ModalController, public toastCtrl: ToastController, public push: Push, 
-    public loadingCtrl: LoadingController, public plt: Platform) {
+    public loadingCtrl: LoadingController, public plt: Platform, public menu: MenuController) {
       this.avail = !plt.is("cordova");
   }
 
   ionViewDidLoad() {
+
+    if (localStorage.getItem("latestVersion") != this.local_version) {
+      let modal = this.modalCtrl.create(WhatsnewPage);
+      modal.present();
+    }
+
     let options: PushOptions = {
       ios: {
         alert: true,
         badge: false,
         sound: true
       },
-      browser: {}
+      browser: {}  
     }
     
     let pushObject = this.push.init(options);
@@ -377,11 +387,19 @@ export class NowTeachersPage {
       buttons: ["Dismiss"]
     })
 
-    alert.present();
+    alert.present(); 
   }
 
   duration(timestamp: number, days: number) {
     let interval = Math.floor(Date.now() / 1000) - timestamp
     return days - Math.floor(interval / 86400)
+  }
+
+  openMenu() {
+    this.menu.open()
+  }
+
+  getCurrentPage(): String {
+    return this.currentPage.charAt(0).toUpperCase() + this.currentPage.slice(1);
   }
 }

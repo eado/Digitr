@@ -21,6 +21,7 @@ import { Push } from '@ionic-native/push';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { AnauserPage } from '../pages/anauser/anauser';
 import { MessagePage } from '../pages/message/message';
+import { WhatsnewPage } from '../pages/whatsnew/whatsnew'; 
 
 @NgModule({
   declarations: [
@@ -34,12 +35,13 @@ import { MessagePage } from '../pages/message/message';
     ApprovepassPage,
     TimerPage,
     AnauserPage,
-    MessagePage
+    MessagePage,
+    WhatsnewPage
   ],
   imports: [
     BrowserModule,
     IonicModule.forRoot(MyApp, {
-      mode: 'ios',
+      mode: 'ios',    
       platforms: {
         ios: {
           tabsHideOnSubPages: true
@@ -60,7 +62,8 @@ import { MessagePage } from '../pages/message/message';
     ApprovepassPage,
     TimerPage,
     AnauserPage,
-    MessagePage
+    MessagePage,
+    WhatsnewPage
   ],
   providers: [
     StatusBar,
