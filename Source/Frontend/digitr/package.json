@@ -70,8 +70,8 @@
       "cordova-plugin-screen-orientation": {}
     },
     "platforms": [
-      "ios",
-      "osx"
+      "osx",
+      "ios"
     ]
   }
 }
