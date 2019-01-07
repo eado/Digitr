@@ -109,7 +109,7 @@ export class NowStudentsPage {
       this.a.getDistrictInfo().then((dist) => {
         this.districtInfo = dist
         if (this.user.history) {
-          this.history = this.user.history;
+          this.history = (this.user.history as any[]).reverse();
         }
         let usedPasses: any[] = []
     
