@@ -376,7 +376,7 @@ class Responder:
             if {'user': email, 'message': message['timestamp']} not in nots_sent:
                 for noti in user.get('notifications'):
                     if noti['type'] == 'ios':
-                        apns = APNs(use_sandbox=True, cert_file="cert-live.pem", key_file='key-live.pem')
+                        apns = APNs(use_sandbox=False, cert_file="cert-live.pem", key_file='key-live.pem')
                         payload = Payload(alert="{}: {}".format(message['title'], message['subTitle']), sound="default", mutable_content=True)
                         apns.gateway_server.send_notification(noti['id'], payload)
                 nots_sent.append({'user': user['email'], 'message': message['timestamp']})

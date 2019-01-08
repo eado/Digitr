@@ -192,9 +192,17 @@ export class NowStudentsPage {
       let mseconds = Math.floor(seconds) % 60
 
       if (mminutes > minutes || (mminutes == minutes && mseconds > 0) ) {
-        return +mminutes + ":" + +mseconds + " (Overtime)"
+        if (mseconds < 10) {
+          return +mminutes + ":" + "0" + +mseconds + " (Overtime)"
+        } else {
+          return +mminutes + ":" + +mseconds + " (Overtime)"
+        }
       } else {
-        return +mminutes + ":" + +mseconds
+        if (mseconds < 10) {
+          return +mminutes + ":" + "0" + +mseconds
+        } else {
+          return +mminutes + ":" + +mseconds
+        }
       }
     } else {
       return ""
