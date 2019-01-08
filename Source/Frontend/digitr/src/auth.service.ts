@@ -134,9 +134,9 @@ export class AuthService {
         })
     }
 
-    async addDistrict(domains: string[], pass: number, schools?: string[]): Promise<void> {
+    async addDistrict(domains: string[], pass: number, schoolname: String, schools?: string[]): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            this.scs.add({request: "add_district", domains: domains, schools: schools, email: localStorage.getItem('email'), token: this.getToken(), pass: pass}, (value) => {
+            this.scs.add({request: "add_district", domains: domains, schools: schools, email: localStorage.getItem('email'), token: this.getToken(), pass: pass, schoolname: schoolname}, (value) => {
                 if (value.success) {
                     resolve()
                 } else {

@@ -33,6 +33,8 @@ export class StartPage {
 
   teachers_enabled = true;
 
+  schoolname;
+
   constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public modalCtrl: ModalController, public alertCtrl: AlertController) {
     this.domain = localStorage.getItem('email').split('@')[1];
     this.domains.push(this.domain);
@@ -97,7 +99,7 @@ export class StartPage {
 
   async completeSetup() {
     if (this.domains.length > 0 && this.pass > 0 && this.domains.indexOf(this.domain) > -1) {
-      await this.a.addDistrict(this.domains, this.pass, this.schools);
+      await this.a.addDistrict(this.domains, this.pass, this.schoolname, this.schools);
       await this.a.addUser(true, this.school);
 
       this.finishAlert();
