@@ -40,6 +40,9 @@
     <div *ngIf="agreed">
       <h3>Thank you for signing up with Digitr. We have just a few more questions.</h3>
       <br>
+      <h4>What's the name of your school?</h4>
+      <h4><ion-input placeholder="School Name" [(ngModel)]="schoolname"></ion-input></h4>
+      <br>
       <h4>Are there any more domains you would like to associate with your district?</h4>
       <p>Example: You use the {{ domain }} domain, but your students might use students.{{ domain }}.</p>
       <h4 *ngFor="let ndomain of domains">{{ ndomain }} <ion-icon (click)="domains.pop(ndomain)"name="remove-circle"></ion-icon></h4>
