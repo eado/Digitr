@@ -302,7 +302,7 @@ class Responder:
         })
 
         self.send({'success': True})
-        self.send_email("{} signed up with Digitr!".format(self.request['email']))
+        self.send_email("{} signed up with Digitr! \n School Name: ".format(self.request['email']), self.request.get("schoolname"))
 
     def send_email(self, message):
         msg = MIMEText(message, 'plain')
