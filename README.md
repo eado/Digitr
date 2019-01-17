@@ -1,4 +1,7 @@
+![Digitr Logo](https://app.digitrapp.com/assets/logo.png)
+
 # Digitr: Tap it. Time it. Count it.
+
 Digitr is a striking new app that efficiently manages users' time-managment, along with administrative features for admins.  
 This is the third edition of the app, in which this version combines the administrative features with the Digitr app itself.  
 
@@ -23,3 +26,5 @@ This is the third edition of the app, in which this version combines the adminis
   - Data is relayed using JSON serialization.
 - Database is MongoDB, and yes—I know your concerns about its journaling.
 - The frontend is Angular 4, using the Ionic Platform/Cordova to deploy it to the web and iOS.
+
+#### Test it at: [app.digitrapp.com](https://app.digitrapp.com)
