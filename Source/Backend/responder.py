@@ -42,13 +42,12 @@ class Responder:
     db = None
     mongo_client = None
 
-    def __init__(self, client, server, message):
+    def __init__(self, client, server, request):
         self.server = server
         self.client = client
 
         self.mongo_client = MongoClient(port=3232)
 
-        request = json.loads(message)
         self.request = request
 
         self.db = self.mongo_client.digitr

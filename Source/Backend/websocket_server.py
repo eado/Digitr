@@ -213,7 +213,7 @@ class WebSocketHandler(StreamRequestHandler):
             self.keep_alive = 0
             return
         if not masked:
-            logger.warn("Client must always be masked.")
+            logger.info("Client must always be masked.")
             self.keep_alive = 0
             return
         if opcode == OPCODE_CONTINUATION:
