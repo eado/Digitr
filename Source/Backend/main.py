@@ -4,6 +4,10 @@ import json
 import sys
 import os
 import datetime
+import logging
+
+os.system("tput setaf 4")
+print("Digitr Starting...")
 
 from multiprocessing import Process
 from threading import Thread
@@ -16,20 +20,32 @@ from pymongo import MongoClient
 
 from time import sleep
 
-mongo_client = MongoClient(port=3232)
+logger = logging.getLogger("websocket_server")
+logger.setLevel(logging.INFO)
 
+fh = logging.FileHandler('spam.log')
+fh.setLevel(logging.INFO)
+logger.addHandler(fh)
 
 def message_received(client, server, message):
-    try:
-        def start_responder(client, server, message):
-            Responder(client, server, message)
+    request = json.loads(message)
+    def start_responder(client, server, message):
+        try:
+            Responder(client, server, request)
+        except json.JSONDecodeError as e:
+            server.send_message(client, 'Invalid request. {}'.format(e))
+        except KeyError as e:
+            server.send_message(client, 'Invalid request. {}'.format(e))
 
-        p = Thread(target=start_responder, args=(client, server, message))
-        p.start()
-    except json.JSONDecodeError as e:
-        server.send_message(client, 'Invalid request. {}'.format(e))
-    except KeyError as e:
-        server.send_message(client, 'Invalid request. {}'.format(e))
+    p = Thread(target=start_responder, args=(client, server, message))
+    p.daemon = True
+    logger.info(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ", " + 
+              p.name + ", " + 
+              client['address'][0] + ", " + 
+              request.get('request') if not None else "None" + ", " + 
+              request.get('email') if not None else "None" + "\n")
+    
+    p.start()
 
 def client_left(client1, server):
     if client1 in clients:
@@ -39,9 +55,11 @@ def start_server():
     server = WebsocketServer(9001, host='0.0.0.0')
     server.set_fn_message_received(message_received)
     server.set_fn_client_left(client_left)
+    print("Started\n")
     server.run_forever()
 
 def start_payment_service():
+    mongo_client = MongoClient(port=3232)
     db = mongo_client.digitr
 
     while True:
@@ -70,14 +88,13 @@ def start_payment_service():
 
 
 if __name__ == '__main__':
-    os.system("tput setaf 3")
     try:
         p = Thread(target=start_payment_service)
+        p.daemon = True
         p.start()
         start_server()
+        while True: sleep(100)
     except KeyboardInterrupt:
+        print("\nExiting...")
         os.system("tput setaf 7")
-        os.system("killall mongod")
         sys.exit(0)
-    except ValueError:
-        pass 
