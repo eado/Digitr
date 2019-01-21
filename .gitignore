@@ -3,3 +3,4 @@ Source/Backend/venv/*
 Source/Backend/__pycache__/*
 Source/Backend/db/*
 **.DS_Store
+Source/...bfg-report/*

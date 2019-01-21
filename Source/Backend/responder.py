@@ -877,9 +877,9 @@ class Responder:
 
         for user in usersRef:
             for passs in user['history']:
-                teacher = self.db.users.find_one({'name': passs['teacher']})
-                if teacher['school'] == admin['school']:
-                    self.db.users.update({'email': user['email']}, {'$pull': {'history': passs}})
+                # teacher = self.db.users.find_one({'name': passs['teacher']})
+                # if teacher['school'] == admin['school']:
+                self.db.users.update({'email': user['email']}, {'$pull': {'history': passs}})
 
         self.send({'success': True})
 
