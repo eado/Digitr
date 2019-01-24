@@ -211,7 +211,11 @@ class Responder:
         user = self.db.users.find_one({'email': self.request['email']})
         district = self.db.districts.find_one({'domains': {"$in": [user["domain"]]}})
 
-        if user['email'] in district['admins']:
+        admins = district['admins']
+        for num, admin in enumerate(admins):
+            district[num] = admin.lower()
+        
+        if user['email'].lower() in admins:
             return True
         else:
             return False
