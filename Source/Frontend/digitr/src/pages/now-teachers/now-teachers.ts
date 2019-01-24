@@ -192,7 +192,8 @@ export class NowTeachersPage {
         () => {
           let toast = this.toastCtrl.create({
             message: "Pass successfully approved.",
-            showCloseButton: true
+            showCloseButton: true,
+            duration: 3000
           })
           toast.present()
           this.a.dismissMessage(message.timestamp)
@@ -273,7 +274,8 @@ export class NowTeachersPage {
         this.a.sendMessageToAll(value.text).then(() => {
           let toast = this.toastCtrl.create({
             message: "Message was sent.",
-            showCloseButton: true
+            showCloseButton: true,
+            duration: 3000
           })
           toast.present()
         })
@@ -288,7 +290,8 @@ export class NowTeachersPage {
     this.dist = await this.a.getDistrictInfo()
     let toast = this.toastCtrl.create({
       message: "Updated district.",
-      showCloseButton: true
+      showCloseButton: true,
+      duration: 3000
     })
     toast.present()
   }
@@ -305,7 +308,8 @@ export class NowTeachersPage {
             this.a.reset_passes().then(() => {
               let toast = this.toastCtrl.create({
                 message: "Passes reset.",
-                showCloseButton: true
+                showCloseButton: true,
+                duration: 3000
               })
               toast.present()
             })
@@ -332,7 +336,8 @@ export class NowTeachersPage {
             this.a.start_fresh().then(() => {
               let toast = this.toastCtrl.create({
                 message: "Users removed.",
-                showCloseButton: true
+                showCloseButton: true,
+                duration: 3000
               })
               toast.present()
             })

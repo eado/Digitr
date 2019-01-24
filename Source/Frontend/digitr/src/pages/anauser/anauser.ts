@@ -65,7 +65,8 @@ export class AnauserPage {
         this.a.sendMessage(this.user.email, value.text).then(() => {
           let toast = this.toastCtrl.create({
             message: "Message to " + this.user.name + " was sent.",
-            showCloseButton: true
+            showCloseButton: true,
+            duration: 3000
           })
           toast.present()
         })

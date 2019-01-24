@@ -160,7 +160,8 @@ export class NowStudentsPage {
     await this.a.request_pass(teacherEmail, this.dest);
     let alert = this.toastCtrl.create({
       message: "Your pass request was sent to " + this.teacher + ".",
-      showCloseButton: true
+      showCloseButton: true,
+      duration: 3000
     })
     alert.present();
 
