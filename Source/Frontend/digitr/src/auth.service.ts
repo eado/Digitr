@@ -195,7 +195,7 @@ export class AuthService {
 
     async dismissMessage(messageTime: number) {
         return new Promise<void>((r, _) => {
-            this.scs.add({request: "deny_pass", token: this.getToken(), email: localStorage.getItem('email'), message_time: messageTime}, () => {
+            this.scs.add({request: "dismiss_message", token: this.getToken(), email: localStorage.getItem('email'), message_time: messageTime}, () => {
                 r()
             })
         })

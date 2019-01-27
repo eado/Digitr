@@ -551,9 +551,17 @@ class Responder:
         if not self.verify_user():
             self.send({'error': 'uns'})
             return
+        user = self.db.users.find_one({'email': self.request['email']})
+
+        for hist in user['history']:
+            if hist['timestamp'] == self.request['timestamp']:
+                if hist.get('timestamp_end') != None:
+                    self.send({'error': 'arb'})
+                    return
+
+
         self.db.users.update_one({'email': self.request['email'], 'history.timestamp': self.request['timestamp']}, 
                                  {'$set': {'history.$.timestamp_end': datetime.datetime.now().timestamp()}})
-        user = self.db.users.find_one({'email': self.request['email']})
         self.send({'success': True})
 
         self.send_message({
