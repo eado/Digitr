@@ -46,6 +46,8 @@ export class NowStudentsPage {
 
   local_version = MyApp.LOCAL_VERSION;
 
+  hasRequestedPass = false;
+
   constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public modalCtrl: ModalController, private scs: ServerconnService, public toastCtrl: ToastController, public alertCtrl: AlertController, public push: Push, public plt: Platform, public menu: MenuController) {
   }
 
@@ -88,6 +90,9 @@ export class NowStudentsPage {
 
         for (let message of user.messages) {
           if (this.messagesDisplayed.indexOf(message.timestamp) < 0) {
+            if (message.type == "pass_approved" || message.type == "pass_rejected") {
+              this.hasRequestedPass = false;
+            }
             let alert = this.alertCtrl.create({
               title: message.title,
               subTitle: message.subTitle,
@@ -151,6 +156,15 @@ export class NowStudentsPage {
   }
 
   async usepass() {
+    if (this.hasRequestedPass) {
+      let alert = this.toastCtrl.create({
+        message: "You have already requested a pass.",
+        showCloseButton: true,
+        duration: 3000
+      })
+      alert.present();
+      return
+    }
     let teacherEmail: string;
     for (let teach of this.teachersWithNames) {
       if (teach[1] == this.teacher) {
@@ -158,6 +172,7 @@ export class NowStudentsPage {
       }
     }
     await this.a.request_pass(teacherEmail, this.dest);
+    this.hasRequestedPass = true;
     let alert = this.toastCtrl.create({
       message: "Your pass request was sent to " + this.teacher + ".",
       showCloseButton: true,
