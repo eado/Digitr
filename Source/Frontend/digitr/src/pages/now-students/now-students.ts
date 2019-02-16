@@ -89,6 +89,7 @@ export class NowStudentsPage {
         user.messages = (user.messages as any[]).reverse()
 
         for (let message of user.messages) {
+          console.log("fksdfhkdl");
           if (this.messagesDisplayed.indexOf(message.timestamp) < 0) {
             if (message.type == "pass_approved" || message.type == "pass_rejected") {
               this.hasRequestedPass = false;

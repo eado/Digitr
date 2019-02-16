@@ -577,22 +577,21 @@ class Responder:
         if not self.verify_user():
             self.send({'error': 'uns'})
             return
+        nots = self.db.users.find_one({'email': self.request['email']})['notifications']
+
+        type_not = 'web'
         if self.request['ios']:
+            type_not = 'ios'
+
+        if {'type': type_not, 'id': self.request['id']} not in nots:
             self.db.users.update_one({'email': self.request['email']}, 
                                      {'$addToSet': 
                                         {'notifications': 
-                                            {'type': 'ios', 'id': self.request['id']}
+                                            {'type': type_not, 'id': self.request['id']}
                                         }
                                      }
                                     )
-        else:
-            self.db.users.update_one({'email': self.request['email']}, 
-                                     {'$addToSet': 
-                                        {'notifications': 
-                                            {'type': 'web', 'id': self.request['id']}
-                                        }
-                                     }
-                                    )
+
         self.send({'success': True})
 
     def get_teacher_users(self):
