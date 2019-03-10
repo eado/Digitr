@@ -166,6 +166,17 @@ export class NowStudentsPage {
       alert.present();
       return
     }
+    for (let pass of this.history) {
+      if (!('timestamp_end' in pass)) {
+        let alert = this.toastCtrl.create({
+          message: "A pass is currently in duration.",
+          showCloseButton: true,
+          duration: 3000
+        })
+        alert.present();
+        return
+      }
+    }
     let teacherEmail: string;
     for (let teach of this.teachersWithNames) {
       if (teach[1] == this.teacher) {
