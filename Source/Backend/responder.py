@@ -636,7 +636,7 @@ class Responder:
         usersRef = self.db.users.find({'history.teacher': teacher['name']}, {'history': True, 'name': True})
         
         passes = []
-        intervals = 0
+        intervals = []
         minutesTotal = 0
         counts = {}
         destCounts = {}
@@ -658,7 +658,7 @@ class Responder:
                     if not passs.get('timestamp_end'):
                         currently_out.append(passs['user'])
                     if passs.get('timestamp_end'):
-                        intervals += passs.get('timestamp_end', passs['timestamp']) - passs['timestamp']
+                        intervals.append(passs.get('timestamp_end', passs['timestamp']) - passs['timestamp'])
                     minutesTotal += passs['minutes']
 
         if len(passes) < 1:
@@ -670,7 +670,7 @@ class Responder:
 
         passesIssued = len(passes)
             
-        avgInterval = str(int((intervals / passesIssued) / 60)) + ' minutes and ' + str(int(intervals / passesIssued) % 60) + ' seconds'
+        avgInterval = str(intervals[len(intervals // 2)] / 60) + ' minutes and ' + str(intervals[len(intervals // 2)] % 60) + ' seconds'
         avgMinutes = int(minutesTotal / passesIssued)
 
         self.send({'passesIssued': passesIssued, 'avgInterval': avgInterval, 'avgMinutes': avgMinutes, 'freePasses': len(freePasses), 'regularPasses': len(regularPasses), 'mvp': mvp, 'currentlyOut': currently_out, 'mud': mud})
@@ -684,7 +684,7 @@ class Responder:
         usersRef = self.db.users.find({'domain': {'$in': district['domains']}}, {'history': True, 'name': True})
         
         passes = []
-        intervals = 0
+        intervals = []
         minutesTotal = 0
         counts = {}
         teacherCounts = {}
@@ -709,7 +709,7 @@ class Responder:
                     if not passs.get('timestamp_end'):
                         currently_out.append(passs['user'])
                     if passs.get('timestamp_end'):
-                        intervals += passs.get('timestamp_end', passs['timestamp']) - passs['timestamp']
+                        intervals.append(passs.get('timestamp_end', passs['timestamp']) - passs['timestamp'])
                     minutesTotal += passs['minutes']
         
         if len(passes) < 1:
@@ -722,7 +722,7 @@ class Responder:
 
         passesIssued = len(passes)
             
-        avgInterval = str(int((intervals / passesIssued) / 60)) + ' minutes and ' + str(int(intervals / passesIssued) % 60) + ' seconds'
+        avgInterval = str(intervals[len(intervals // 2)] / 60) + ' minutes and ' + str(intervals[len(intervals // 2)] % 60) + ' seconds'
         avgMinutes = int(minutesTotal / passesIssued)
 
         self.send({'passesIssued': passesIssued, 'avgInterval': avgInterval, 'avgMinutes': avgMinutes, 'freePasses': len(freePasses), 'regularPasses': len(regularPasses), 'mvp': mvp, 'currentlyOut': currently_out, 'mvt': mvt, 'mud': mud})
