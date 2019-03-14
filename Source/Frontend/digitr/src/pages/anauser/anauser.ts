@@ -18,13 +18,15 @@ import { MessagePage } from '../message/message';
 export class AnauserPage {
   user;
 
-  history;
+  history: any[];
 
   isAdmin = false;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, public toastCtrl: ToastController, public modalCtrl: ModalController) {
     this.user = navParams.get('user')
     this.history = this.user.history;
+
+    this.history = this.history.reverse();
 
     this.isAdmin = navParams.get('isAdmin')
   }

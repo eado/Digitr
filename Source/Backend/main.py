@@ -39,7 +39,7 @@ def message_received(client, server, message):
 
     p = Thread(target=start_responder, args=(client, server, message))
     p.daemon = True
-    logger.info(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ", " + 
+    print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ", " + 
               p.name + ", " + 
               client['address'][0] + ", " + 
               request.get('request') if not None else "None" + ", " + 

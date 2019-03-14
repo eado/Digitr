@@ -171,7 +171,7 @@
                   </ion-card-header>
                   <ion-card-content>
                       <ion-list>
-                        <ion-item *ngFor="let user of stats.currentlyOut">{{ user }}</ion-item>
+                        <ion-item *ngFor="let user of stats.currentlyOut" (click)="getUser(user)">{{ user }}</ion-item>
                       </ion-list>
                       <h1 *ngIf="stats.currentlyOut.length < 1">Nobody</h1>
                   </ion-card-content>
