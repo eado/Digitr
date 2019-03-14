@@ -358,7 +358,7 @@ class Responder:
             self.send({'error': 'uns'})
             return
         current_user = self.db.users.find_one({'email': self.request['email']})
-        user = self.db.users.find_one({'name': self.request['user'], 'history.teacher': current_user['name']})
+        user = self.db.users.find_one({'name': self.request['user']})
         if current_user['is_teacher']:
             self.send({'success': True, 'user': user})
 
