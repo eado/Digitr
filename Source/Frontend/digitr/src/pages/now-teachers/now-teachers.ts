@@ -164,10 +164,19 @@ export class NowTeachersPage {
     this.getAnalytics()
   }
 
-  async getAnalytics() {
-    this.stats = await this.a.getTeacherStats()
+  async getAnalytics(event=null) {
+    if (this.viewAsAdmin) {
+      this.stats = await this.a.getAdminStats()
+      this.students = await this.a.getAdminUsers()
+    } else {
+      this.stats = await this.a.getTeacherStats()
     this.students = await this.a.getTeacherUsers()
+    }
     this.filteredStudents = this.students
+
+    if (event) {
+      event.complete()
+    }
   }
 
   deny(message: number, user: string) {

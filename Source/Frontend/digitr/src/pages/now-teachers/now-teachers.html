@@ -99,6 +99,9 @@
     </ion-list>
   </div>
   <div *ngIf="currentPage == 'analytics'">
+      <ion-refresher slot="fixed" (ionRefresh)="getAnalytics($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
       <h1 class="nohistory" *ngIf="!analytics">Analytics is not enabled. <br> Please refer to your administrator.</h1>
       <div *ngIf="analytics">
         <div *ngIf="analyticsPage == 'stats'">
