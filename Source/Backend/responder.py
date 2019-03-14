@@ -884,13 +884,8 @@ class Responder:
             return
         admin = self.db.users.find_one({'email': self.request['email']})
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
-        usersRef = self.db.users.find({'domain': {'$in': district['domains']}}, {'history': True, 'email': True})
-
-        for user in usersRef:
-            for passs in user['history']:
-                # teacher = self.db.users.find_one({'name': passs['teacher']})
-                # if teacher['school'] == admin['school']:
-                self.db.users.update({'email': user['email']}, {'$pull': {'history': passs}})
+        
+        self.db.users.update_many({'domains': {'$in': district['domains']}}, {'$set': {'history': []}});
 
         self.send({'success': True})
 
