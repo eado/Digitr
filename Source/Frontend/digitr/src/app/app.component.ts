@@ -16,7 +16,7 @@ import { ScreenOrientation } from '@ionic-native/screen-orientation';
 })
 export class MyApp {
 
-  public static LOCAL_VERSION = "3.1";
+  public static LOCAL_VERSION = "3.2";
 
   rootPage: any;
 

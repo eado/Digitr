@@ -88,4 +88,15 @@ export class AnauserPage {
     alert.present()
   }
 
+  async sendBack(timestamp) {
+    await this.a.send_back(timestamp, this.user.email);
+
+    let alert = this.alertCtrl.create({
+      title: "Person was sent back.",
+      buttons: ["Dismiss"]
+    })
+
+    alert.present()
+  }
+
 }

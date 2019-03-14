@@ -235,6 +235,8 @@ export class NowTeachersPage {
   }
 
   async getCSV() {
+    let loading = this.loadingCtrl.create({content: "Loading csv data...", enableBackdropDismiss: true});
+    loading.present();
     let string;
     if (this.viewAsAdmin) {
       string = await this.a.getCSVAdmin()
@@ -246,6 +248,7 @@ export class NowTeachersPage {
     document.body.appendChild(a);
     a.hidden = true
 
+    loading.dismiss();
     let blob = new Blob([string], {type: 'text/csv'})
     let url = window.URL.createObjectURL(blob)
     a.href = url;
@@ -254,6 +257,8 @@ export class NowTeachersPage {
   }
 
   async toggleAdmin() {
+    let loading = this.loadingCtrl.create({content: "Loading teacher/admin data...", enableBackdropDismiss: true});
+    loading.present();
     if (this.viewAsAdmin) {
       this.stats = await this.a.getTeacherStats()
       this.students = await this.a.getTeacherUsers()
@@ -265,6 +270,7 @@ export class NowTeachersPage {
       this.filteredStudents = this.students
       this.viewAsAdmin = true
     }
+    loading.dismiss();
   }
 
   sendToAll() {

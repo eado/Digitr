@@ -234,11 +234,11 @@ export class AuthService {
     async send_back(timestamp: number, user: string) {
         return new Promise<void>((r, _) => {
             this.scs.add({
-                request: "back_from_pass",
+                request: "send_back",
                 token: this.getToken(),
                 email: localStorage.getItem('email'),
                 timestamp: timestamp,
-                teacher: teacher
+                user: user
             }, () => {
                 r()
             })

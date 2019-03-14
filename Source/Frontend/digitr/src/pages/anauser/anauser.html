@@ -33,7 +33,7 @@
         <span *ngIf="pass.name != 'Free'">Pass {{ pass.name }}</span>
 
         <ion-badge (click)="removePass(pass.timestamp)" *ngIf="isAdmin" item-end>Remove Pass</ion-badge>
-        <ion-badge color="danger" (click)="removePass(pass.timestamp)" *ngIf="!pass.timestamp_end" item-end>Send Back</ion-badge>
+        <ion-badge color="danger" (click)="sendBack(pass.timestamp)" *ngIf="!pass.timestamp_end" item-end>Send Back</ion-badge>
       </ion-list-header>
       <ion-item>
         Destination
