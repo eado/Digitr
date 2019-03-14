@@ -670,7 +670,7 @@ class Responder:
 
         passesIssued = len(passes)
             
-        avgInterval = str(intervals[len(intervals) // 2] / 60) + ' minutes and ' + str(intervals[len(intervals) // 2] % 60) + ' seconds'
+        avgInterval = str(int(intervals[len(intervals) // 2] / 60)) + ' minutes and ' + str(int(intervals[len(intervals) // 2] % 60)) + ' seconds'
         avgMinutes = int(minutesTotal / passesIssued)
 
         self.send({'passesIssued': passesIssued, 'avgInterval': avgInterval, 'avgMinutes': avgMinutes, 'freePasses': len(freePasses), 'regularPasses': len(regularPasses), 'mvp': mvp, 'currentlyOut': currently_out, 'mud': mud})
