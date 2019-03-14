@@ -231,6 +231,20 @@ export class AuthService {
         })
     }
 
+    async send_back(timestamp: number, user: string) {
+        return new Promise<void>((r, _) => {
+            this.scs.add({
+                request: "back_from_pass",
+                token: this.getToken(),
+                email: localStorage.getItem('email'),
+                timestamp: timestamp,
+                teacher: teacher
+            }, () => {
+                r()
+            })
+        })
+    }
+
     async setNotification(id: string) {
         return new Promise<void>((r, _) => {
             this.scs.add({

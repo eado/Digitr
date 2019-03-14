@@ -639,7 +639,7 @@ class Responder:
             self.send({'error': 'unt'})
             return
 
-        self.db.users.update_one({'email': self.request['email'], 'history.timestamp': self.request['timestamp']}, 
+        self.db.users.update_one({'email': self.request['user'], 'history.timestamp': self.request['timestamp']}, 
                                  {'$set': {'history.$.timestamp_end': datetime.datetime.now().timestamp()}})
         
         self.send({"success": True})
