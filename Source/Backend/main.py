@@ -86,12 +86,37 @@ def start_payment_service():
         
         sleep(3600)
 
+def send_students_back():
+    mongo_client = MongoClient(port=3232)
+    db = mongo_client.digitr
+
+    while True:
+        users = db.users.find({})
+        now = datetime.datetime.now().timestamp()
+
+        for user in users:
+            for hist in user['history']:
+                if hist.get('timestamp_end'):
+                    continue
+                else:
+                    if (now - hist['timestamp']) >= 86400:
+                        hist['timestamp_end'] = hist['timestamp'] + 3600
+                        db.users.update_one({'email': user['email'], 'history.timestamp': hist['timestamp']}, 
+                                 {'$set': {'history.$.timestamp_end': hist['timestamp'] + 3600}})
+    
+        sleep(3600)
+
 
 if __name__ == '__main__':
     try:
         p = Thread(target=start_payment_service)
         p.daemon = True
         p.start()
+
+        p = Thread(target=send_students_back)
+        p.daemon = True
+        p.start()
+
         start_server()
         while True: sleep(100)
     except KeyboardInterrupt:
