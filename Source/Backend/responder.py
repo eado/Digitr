@@ -84,6 +84,8 @@ class Responder:
             self.send_everyone_back()
         if request['request'] == 'purge_pass':
             self.purge_pass()
+        if request['request'] == 'send_back':
+            self.send_back()
         if request['request'] == 'get_teacher_stats':
             self.get_teacher_stats()
         if request['request'] == 'get_teacher_users':
@@ -625,6 +627,21 @@ class Responder:
                             {'$set': {"history.$[element].timestamp_end": datetime.datetime.now().timestamp()}}, 
                             False, [{'$and': [{"element.teacher": user["name"]}, {"element.timestamp_end": None}]}])
 
+        self.send({"success": True})
+
+    def send_back(self):
+        if not self.verify_user():
+            self.send({'error': 'uns'})
+            return
+        user = self.db.users.find_one({'email': self.request['email']})
+
+        if not user["is_teacher"]:
+            self.send({'error': 'unt'})
+            return
+
+        self.db.users.update_one({'email': self.request['email'], 'history.timestamp': self.request['timestamp']}, 
+                                 {'$set': {'history.$.timestamp_end': datetime.datetime.now().timestamp()}})
+        
         self.send({"success": True})
 
     
