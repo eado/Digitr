@@ -902,7 +902,7 @@ class Responder:
         admin = self.db.users.find_one({'email': self.request['email']})
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
         
-        self.db.users.update_many({'domains': {'$in': district['domains']}}, {'$set': {'history': []}});
+        self.db.users.update_many({'domain': {'$in': district['domains']}}, {'$set': {'history': []}});
 
         self.send({'success': True})
 
