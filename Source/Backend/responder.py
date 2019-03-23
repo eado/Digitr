@@ -107,8 +107,7 @@ class Responder:
         if request['request'] == 'edit_district':
             self.edit_district()
         if request['request'] == 'reset_passes':
-            process = Process(target=self.reset_passes)
-            process.start()
+            self.reset_passes()
         if request['request'] == 'start_fresh':
             self.start_fresh()
         if request['request'] == 'get_payment_stats':
@@ -902,7 +901,7 @@ class Responder:
         admin = self.db.users.find_one({'email': self.request['email']})
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
         
-        self.db.users.update_many({'domain': {'$in': district['domains']}}, {'$set': {'history': []}});
+        self.db.users.update_many({'domain': {'$in': district['domains']}}, {'$set': {'history': []}})
 
         self.send({'success': True})
 
