@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 
-db = MongoClient(port=3232)
+db = MongoClient(port=3232).digitr
 
 domain = input("Domain: ")
 district = db.districts.find_one({'domains': domain})
