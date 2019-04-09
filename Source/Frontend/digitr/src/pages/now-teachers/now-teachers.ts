@@ -58,10 +58,13 @@ export class NowTeachersPage {
 
   local_version = MyApp.LOCAL_VERSION;
 
+  mvpenabled;
+
   constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, 
     public modalCtrl: ModalController, public toastCtrl: ToastController, public push: Push, 
     public loadingCtrl: LoadingController, public plt: Platform, public menu: MenuController) {
       this.avail = !plt.is("cordova");
+      this.mvpenabled = localStorage.getItem("mvpenabled") == "true"
   }
 
   ionViewDidLoad() {
@@ -309,6 +312,16 @@ export class NowTeachersPage {
       duration: 3000
     })
     toast.present()
+  }
+
+  mvptoggle() {
+    if (this.mvpenabled) {
+      this.mvpenabled = false;
+      localStorage.setItem("mvpenabled", "false")
+    } else {
+      this.mvpenabled = true;
+      localStorage.setItem("mvpenabled", "true")
+    }
   }
 
   async reset() {

@@ -816,22 +816,25 @@ class Responder:
             for passs in user['history']:
                 teacher = self.db.users.find_one({'name': passs['teacher']})
                 if teacher['school'] == admin['school']:
-                    text += (user['name'] + ',')
-                    text += (str(passs['name']) + ',')
-                    text += (passs['destination'] + ',')
-                    text += (passs['teacher'] + ',')
-                    text += (str(passs['minutes']) + ',')
+                    try:
+                        text += (user['name'] + ',')
+                        text += (str(passs['name']) + ',')
+                        text += (passs['destination'] + ',')
+                        text += (passs['teacher'] + ',')
+                        text += (str(passs['minutes']) + ',')
 
-                    timestamp = (datetime.datetime.fromtimestamp(
-                                    passs['timestamp']
-                                ) - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')
-                    text += (timestamp + ',')
-
-                    timestamp_end = (datetime.datetime.fromtimestamp(
-                                        passs.get('timestamp_end', passs['timestamp'])
+                        timestamp = (datetime.datetime.fromtimestamp(
+                                        passs['timestamp']
                                     ) - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')
-                    text += (timestamp_end + ',')
-                    text += ('\n')
+                        text += (timestamp + ',')
+
+                        timestamp_end = (datetime.datetime.fromtimestamp(
+                                            passs.get('timestamp_end', passs['timestamp'])
+                                        ) - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')
+                        text += (timestamp_end + ',')
+                        text += ('\n')
+                    except TypeError:
+                        continue
                     
         self.send({'csv_data': text})
 
