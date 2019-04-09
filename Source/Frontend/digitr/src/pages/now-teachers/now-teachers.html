@@ -159,12 +159,10 @@
               </div>
               <div col-md-6 col-12>
                 <ion-card color="light" (click)="mvptoggle()">
-                  <ion-card-header>
-                    Student who used the most passes
-                  </ion-card-header>
-                  <ion-card-header>
-                      <b>Expand</b>
-                  </ion-card-header>
+                    <ion-item color="light">
+                        <h3 id="mvp">Student who used the most passes</h3>
+                        <ion-badge item-end>+</ion-badge>
+                      </ion-item>
                   <ion-card-content *ngIf="mvpenabled">
                       <h1>{{ stats.mvp }}</h1>
                   </ion-card-content>
