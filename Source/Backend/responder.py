@@ -54,73 +54,75 @@ class Responder:
 
         if request['request'] == 'signin':
             self.signin()
-        if request['request'] == 'user_exists':
+        elif request['request'] == 'user_exists':
             self.user_exists()
-        if request['request'] == 'get_district':
+        elif request['request'] == 'get_district':
             self.get_district()
-        if request['request'] == 'add_district':
+        elif request['request'] == 'add_district':
             self.add_district()
-        if request['request'] == 'add_user':
+        elif request['request'] == 'add_user':
             self.add_user()
-        if request['request'] == 'get_user':
+        elif request['request'] == 'get_user':
             self.get_user()
-        if request['request'] == 'get_district_info':
+        elif request['request'] == 'get_district_info':
             self.get_district_info()
-        if request['request'] == 'request_pass':
+        elif request['request'] == 'request_pass':
             self.request_pass()
-        if request['request'] == 'deny_pass':
+        elif request['request'] == 'deny_pass':
             self.deny_pass()
-        if request['request'] == 'dismiss_message':
+        elif request['request'] == 'dismiss_message':
             self.dismiss_message()
-        if request['request'] == 'approve_pass':
+        elif request['request'] == 'approve_pass':
             self.approve_pass()
-        if request['request'] == 'back_from_pass':
+        elif request['request'] == 'back_from_pass':
             self.back_from_pass()
-        if request['request'] == 'set_notification':
+        elif request['request'] == 'set_notification':
             self.set_notification()
-        if request['request'] == 'clear_messages':
+        elif request['request'] == 'clear_messages':
             self.clear_messages()
-        if request['request'] == 'send_everyone_back':
+        elif request['request'] == 'send_everyone_back':
             self.send_everyone_back()
-        if request['request'] == 'purge_pass':
+        elif request['request'] == 'purge_pass':
             self.purge_pass()
-        if request['request'] == 'send_back':
+        elif request['request'] == 'send_back':
             self.send_back()
-        if request['request'] == 'get_teacher_stats':
-            self.get_teacher_stats()
-        if request['request'] == 'get_teacher_users':
+        elif request['request'] == 'get_teacher_stats':
+            self.get_stats(False)
+        elif request['request'] == 'get_teacher_users':
             self.get_teacher_users()
-        if request['request'] == 'get_user_from_name':
+        elif request['request'] == 'get_user_from_name':
             self.get_user_from_name()
-        if request['request'] == 'send_custom_message':
+        elif request['request'] == 'send_custom_message':
             self.send_custom_message()
-        if request['request'] == 'get_csv_for_teacher':
-            self.get_csv_for_teacher()
-        if request['request'] == 'get_admin_stats':
-            self.get_admin_stats()
-        if request['request'] == 'get_admin_users':
+        elif request['request'] == 'get_csv_for_teacher':
+            self.get_csv(False)
+        elif request['request'] == 'get_admin_stats':
+            self.get_stats(True)
+        elif request['request'] == 'get_admin_users':
             self.get_all_users()
-        if request['request'] == 'get_csv_for_admin':
-            self.get_csv_for_admin()
-        if request['request'] == 'send_to_all':
+        elif request['request'] == 'get_csv_for_admin':
+            self.get_csv(True)
+        elif request['request'] == 'remove_user':
+            self.remove_user()
+        elif request['request'] == 'send_to_all':
             self.send_custom_message_to_all()
-        if request['request'] == 'edit_district':
+        elif request['request'] == 'edit_district':
             self.edit_district()
-        if request['request'] == 'reset_passes':
+        elif request['request'] == 'reset_passes':
             self.reset_passes()
-        if request['request'] == 'start_fresh':
+        elif request['request'] == 'start_fresh':
             self.start_fresh()
-        if request['request'] == 'get_payment_stats':
+        elif request['request'] == 'get_payment_stats':
             self.get_payment_stats()
-        if request['request'] == 'start_payment':
+        elif request['request'] == 'start_payment':
             self.start_payment()
-        if request['request'] == 'execute_payment':
+        elif request['request'] == 'execute_payment':
             self.execute_payment()
-        if request['request'] == 'start_trial':
+        elif request['request'] == 'start_trial':
             self.start_trial_period()
-        if request['request'] == 'get_ms_data':
+        elif request['request'] == 'get_ms_data':
             self.get_ms_data()
-    
+
     def get_ms_data(self):
         response = request("GET", "https://graph.microsoft.com/v1.0/me", 
                                     headers={'Authorization': self.request['token']})
@@ -158,10 +160,10 @@ class Responder:
             if user:
                 teachers_with_names.append((user.get('email'), user.get('name')))
 
-        self.send({'schools': district["schools"], 'pass': district['pass'], 
-                   'teachers': district['teachers'], 'destinations': district.get('destinations'), 
+        self.send({'schools': district["schools"], 'pass': district['pass'], 'destinations': district.get('destinations'), 
                    'teachers_with_names': teachers_with_names, 'admins': district["admins"], 'analytics': district.get('analytics'), 
-                   'domains': district['domains'], 'legacy': district.get('legacy'), 'teachers_enabled': district.get("teachers_enabled")})
+                   'domains': district['domains'], 'legacy': district.get('legacy'), 'teachers_enabled': district.get("teachers_enabled"), 
+                   'out_teachers': district.get('out_teachers')})
 
     def user_exists(self):
         user = self.db.users.find_one({'email': self.request['email']})
@@ -604,6 +606,7 @@ class Responder:
         if not user["is_teacher"]:
             self.send({'error': 'unt'})
             return
+
         self.send({'users': self.db.users.distinct("name", {"is_teacher": False, "domain": {"$in": district['domains']}, "history.teacher": user['name']})})
 
     def clear_messages(self):
@@ -643,61 +646,23 @@ class Responder:
         
         self.send({"success": True})
 
+    def get_stats(self, use_admin):
+        if use_admin:
+            if not self.isAdmin():
+                self.send({'error': 'una'})
+                return
+        else:
+            if not self.verify_user():
+                self.send({'error': 'uns'})
+                return
     
-    def get_teacher_stats(self):
-        if not self.verify_user():
-            self.send({'error': 'uns'})
-            return
-        teacher = self.db.users.find_one({'email': self.request['email']})
-        usersRef = self.db.users.find({'history.teacher': teacher['name']}, {'history': True, 'name': True})
-        
-        passes = []
-        intervals = []
-        minutesTotal = 0
-        counts = {}
-        destCounts = {}
-        freePasses = []
-        regularPasses = []
-        currently_out = []
-
-        for user in usersRef:
-            for passs in user['history']:
-                if passs['teacher'] == teacher['name']:
-                    passs['user'] = user['name']
-                    passes.append(passs)
-                    if passs['name'] == 'Free':
-                        freePasses.append(passs)
-                    else:
-                        regularPasses.append(passs)
-                    counts[passs['user']] = counts.get(passs['user'], 0) + 1
-                    destCounts[passs['destination']] = destCounts.get(passs['destination'], 0) + 1
-                    if not passs.get('timestamp_end'):
-                        currently_out.append(passs['user'])
-                    if passs.get('timestamp_end'):
-                        intervals.append(passs.get('timestamp_end', passs['timestamp']) - passs['timestamp'])
-                    minutesTotal += passs['minutes']
-
-        if len(passes) < 1:
-            self.send({'passesIssued': 0, 'avgInterval': 0, 'avgMinutes': 0, 'freePasses': 0, 'regularPasses': 0, 'mvp': 'Nobody', 'currentlyOut': []})
-            return
-        
-        mvp = max(counts, key=counts.get)
-        mud = max(destCounts, key=destCounts.get)
-
-        passesIssued = len(passes)
-            
-        avgInterval = str(int(intervals[len(intervals) // 2] / 60)) + ' minutes and ' + str(int(intervals[len(intervals) // 2] % 60)) + ' seconds'
-        avgMinutes = int(minutesTotal / passesIssued)
-
-        self.send({'passesIssued': passesIssued, 'avgInterval': avgInterval, 'avgMinutes': avgMinutes, 'freePasses': len(freePasses), 'regularPasses': len(regularPasses), 'mvp': mvp, 'currentlyOut': currently_out, 'mud': mud})
-
-    def get_admin_stats(self):
-        if not self.isAdmin():
-            self.send({'error': 'una'})
-            return
-        admin = self.db.users.find_one({'email': self.request['email']})
+        stater = self.db.users.find_one({'email': self.request['email']})
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
-        usersRef = self.db.users.find({'domain': {'$in': district['domains']}}, {'history': True, 'name': True})
+
+        query = {'domain': {'$in': district['domains']}}
+        if not use_admin:
+            query['history.teacher'] = stater['name']
+        usersRef = self.db.users.find(query, {'history': True, 'name': True})
         
         passes = []
         intervals = []
@@ -711,8 +676,16 @@ class Responder:
 
         for user in usersRef:
             for passs in user['history']:
-                teacher = self.db.users.find_one({'name': passs['teacher']})
-                if teacher.get('school') == admin.get('school'):
+                try:
+                    if (self.request['all'] and district.get('out_teachers')) or use_admin:
+                        if not passs.get('timestamp_end'):
+                            currently_out.append(passs['user'])
+                    else:
+                        if passs['teacher'] == stater['name']:
+                            currently_out.append(passs['user'])
+                    if not use_admin:
+                        if passs['teacher'] != stater['name']:
+                            continue
                     passs['user'] = user['name']
                     passes.append(passs)
                     if passs['name'] == 'Free':
@@ -720,28 +693,39 @@ class Responder:
                     else:
                         regularPasses.append(passs)
                     counts[passs['user']] = counts.get(passs['user'], 0) + 1
-                    teacherCounts[passs['teacher']] = teacherCounts.get(passs['teacher'], 0) + 1
+                    if use_admin:
+                        teacherCounts[passs['teacher']] = teacherCounts.get(passs['teacher'], 0) + 1
                     destCounts[passs['destination']] = destCounts.get(passs['destination'], 0) + 1
-                    if not passs.get('timestamp_end'):
-                        currently_out.append(passs['user'])
                     if passs.get('timestamp_end'):
                         intervals.append(passs.get('timestamp_end', passs['timestamp']) - passs['timestamp'])
                     minutesTotal += passs['minutes']
+                except KeyError as e:
+                    print(e)
         
         if len(passes) < 1:
             self.send({'passesIssued': 0, 'avgInterval': 0, 'avgMinutes': 0, 'freePasses': 0, 'regularPasses': 0, 'mvp': 'Nobody', 'currentlyOut': [], 'mvt': 'Nobody'})
             return
 
         mvp = max(counts, key=counts.get)
-        mvt = max(teacherCounts, key=teacherCounts.get)
+        mvt = 0
+        if use_admin:
+            mvt = max(teacherCounts, key=teacherCounts.get)
         mud = max(destCounts, key=destCounts.get)
 
         passesIssued = len(passes)
-            
-        avgInterval = str(int(intervals[len(intervals) // 2] / 60)) + ' minutes and ' + str(int(intervals[len(intervals) // 2] % 60)) + ' seconds'
+        
+        avgInterval = "0 minutes and 0 seconds"
+        try:
+            avgInterval = str(int(intervals[len(intervals) // 2] / 60)) + ' minutes and ' + str(int(intervals[len(intervals) // 2] % 60)) + ' seconds'
+        except IndexError:
+            pass
+
         avgMinutes = int(minutesTotal / passesIssued)
 
-        self.send({'passesIssued': passesIssued, 'avgInterval': avgInterval, 'avgMinutes': avgMinutes, 'freePasses': len(freePasses), 'regularPasses': len(regularPasses), 'mvp': mvp, 'currentlyOut': currently_out, 'mvt': mvt, 'mud': mud})
+        message = {'passesIssued': passesIssued, 'avgInterval': avgInterval, 'avgMinutes': avgMinutes, 'freePasses': len(freePasses), 'regularPasses': len(regularPasses), 'mvp': mvp, 'currentlyOut': currently_out, 'mud': mud}
+        if use_admin:
+            message['mvt'] = mvt
+        self.send(message)
 
     def send_custom_message(self):
         if not self.verify_user():
@@ -774,17 +758,31 @@ class Responder:
         }, district['students'] + district['teachers'])
         self.send({'success': True})
 
-    def get_csv_for_teacher(self):
-        if not self.verify_user():
-            self.send({'error': 'uns'})
-            return
-        teacher = self.db.users.find_one({'email': self.request['email']})
-        usersRef = self.db.users.find({'history.teacher': teacher['name']}, {'history': True, 'name': True})
+    def get_csv(self, use_admin):
+        if use_admin:
+            if not self.isAdmin():
+                self.send({'error': 'una'})
+                return
+        else:
+            if not self.verify_user():
+                self.send({'error': 'uns'})
+                return
+    
+        stater = self.db.users.find_one({'email': self.request['email']})
+        district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
+
+        query = {'domain': {'$in': district['domains']}}
+        if not use_admin:
+            query['history.teacher'] = stater['name']
+        usersRef = self.db.users.find(query, {'history': True, 'name': True})
         text = "User,Pass,Destination,Teacher,Minutes,Timestamp(EST),End Time(EST)\n"
 
         for user in usersRef:
             for passs in user['history']:
-                if passs['teacher'] == teacher['name']:
+                try:
+                    if not use_admin:
+                        if passs['teacher'] != stater['name']:
+                            continue
                     text += (user['name'] + ',')
                     text += (str(passs['name']) + ',')
                     text += (passs['destination'] + ',')
@@ -801,40 +799,8 @@ class Responder:
                                     ) - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')
                     text += (timestamp_end + ',')
                     text += ('\n')
-        self.send({'csv_data': text})
-
-    def get_csv_for_admin(self):
-        if not self.isAdmin():
-            self.send({'error': 'una'})
-            return
-        admin = self.db.users.find_one({'email': self.request['email']})
-        district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
-        usersRef = self.db.users.find({'domain': {'$in': district['domains']}}, {'history': True, 'name': True})
-        text = "User,Pass,Destination,Teacher,Minutes,Timestamp(EST),End Time(EST)\n"
-
-        for user in usersRef:
-            for passs in user['history']:
-                teacher = self.db.users.find_one({'name': passs['teacher']})
-                if teacher['school'] == admin['school']:
-                    try:
-                        text += (user['name'] + ',')
-                        text += (str(passs['name']) + ',')
-                        text += (passs['destination'] + ',')
-                        text += (passs['teacher'] + ',')
-                        text += (str(passs['minutes']) + ',')
-
-                        timestamp = (datetime.datetime.fromtimestamp(
-                                        passs['timestamp']
-                                    ) - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')
-                        text += (timestamp + ',')
-
-                        timestamp_end = (datetime.datetime.fromtimestamp(
-                                            passs.get('timestamp_end', passs['timestamp'])
-                                        ) - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')
-                        text += (timestamp_end + ',')
-                        text += ('\n')
-                    except TypeError:
-                        continue
+                except TypeError:
+                    continue
                     
         self.send({'csv_data': text})
 
@@ -844,6 +810,15 @@ class Responder:
             return
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
         self.send({'users': self.db.users.distinct("name", {'domain': {'$in': district['domains']}, 'is_teacher': False})})
+
+    def remove_user(self):
+        if not self.isAdmin():
+            self.send({'error': 'una'})
+            return
+        district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
+        self.db.users.delete_one({'email': self.request['user'], 'domain': {'$in': district['domains']}})
+
+        self.send({'success': True})
 
     def edit_district(self):
         if not self.isAdmin():
@@ -894,6 +869,11 @@ class Responder:
                 self.db.districts.update(query, {'$set': {'teachers_enabled': True}})
             else:
                 self.db.districts.update(query, {'$set': {'teachers_enabled': False}})
+        elif self.request['field'] == 'out_teachers':
+            if self.request['data'] == True:
+                self.db.districts.update(query, {'$set': {'out_teachers': True}})
+            else:
+                self.db.districts.update(query, {'$set': {'out_teachers': False}})
         
         self.send({'success': True})
 

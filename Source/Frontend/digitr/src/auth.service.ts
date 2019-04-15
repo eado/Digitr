@@ -165,18 +165,6 @@ export class AuthService {
         })
     }
 
-    // async listOfEmailsToNames(list: string[]): Promise<[string, string][]> {
-    //     let token;         if (this.plt.is('cordova')) {             token = this.user.idToken         } else {             token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().id_token         }
-    //     let list2: [string, string][] = [];
-        
-    //     for (let el of list) {
-    //         let val = await this.scs.add({request: "get_name_for_user", user: el, token: token, email: localStorage.getItem('email')})
-    //         list2.push([el, val.name])
-    //     }
-
-    //     return new Promise<[string, string][]>((r, _) => r(list2))
-    // }
-
     async request_pass(teacherEmail: string, dest: string) {
         return new Promise<void>((resolve, _) => {
             this.scs.add({request: "request_pass", email: localStorage.getItem("email"), user: teacherEmail, token: this.getToken(), dest: dest}, (value) => {
@@ -259,12 +247,13 @@ export class AuthService {
         })
     }
 
-    async getTeacherStats(): Promise<any> {
+    async getTeacherStats(all: boolean): Promise<any> {
         return new Promise<any>((r, _) => {
             this.scs.add({
                 request: "get_teacher_stats",
                 token: this.getToken(),
                 email: localStorage.getItem('email'),
+                all: all
             }, value => {
                 r(value)
             })
@@ -512,6 +501,23 @@ export class AuthService {
                 email: localStorage.getItem('email'),
                 timestamp: timestamp,
                 user: user
+            }, value => {
+                if (value.error) {
+                    rej()
+                } else {
+                    r()
+                }
+            })
+        })
+    }
+
+    async remove(email: String) {
+        return new Promise<string>((r, rej) => {
+            this.scs.add({
+                request: "remove_user", 
+                token: this.getToken(),
+                email: localStorage.getItem('email'),
+                user: email
             }, value => {
                 if (value.error) {
                     rej()

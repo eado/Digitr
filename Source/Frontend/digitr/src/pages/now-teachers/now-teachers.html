@@ -170,9 +170,11 @@
               </div>
               <div col-md-6 col-12>
                 <ion-card color="dark">
-                  <ion-card-header>
-                    Currently Out
-                  </ion-card-header>
+                  <ion-item color="dark">
+                    <h3 id="mvp">Currently Out</h3>
+                    <ion-badge *ngIf="all && !viewAsAdmin" item-end (click)="setAll()">All</ion-badge>
+                    <ion-badge *ngIf="!all && !viewAsAdmin" item-end (click)="setAll()">Teacher</ion-badge>
+                  </ion-item>
                   <ion-card-content>
                       <ion-list>
                         <ion-item *ngFor="let user of stats.currentlyOut" (click)="getUser(user)">{{ user }}</ion-item>
@@ -207,6 +209,17 @@
         <div *ngIf="analyticsPage == 'search'">
             <ion-searchbar (ionInput)="getItems($event)"></ion-searchbar>
             <ion-list>
+              
+              <ion-item>
+                <ion-segment [(ngModel)]="searchseg" (click)="getAnalytics()">
+                  <ion-segment-button value="students">
+                    Students
+                  </ion-segment-button>
+                  <ion-segment-button value="teachers">
+                    Teachers
+                  </ion-segment-button>
+                </ion-segment>
+              </ion-item>
               <ion-item (click)="sendToAll()" *ngIf="isAdmin"><a>Send message to all students and teachers</a></ion-item>
               <ion-item (click)="getUser(user)" *ngFor="let user of filteredStudents">{{ user }}<ion-note item-end><ion-icon  name="arrow-forward"></ion-icon></ion-note></ion-item>
             </ion-list>
@@ -317,7 +330,7 @@
     <ion-list>
       <ion-list-header>Legacy Mode</ion-list-header>
       <ion-item>
-        <ion-label>Turn on Legacy Mode: Students can approve passes without teacher consent.</ion-label>
+        <ion-label>Let students approve passes without teacher consent.</ion-label>
         <ion-toggle #legacy [checked]="dist.legacy" (click)="edit($event, 'legacy', legacy.checked)"></ion-toggle>
       </ion-item>
     </ion-list>
@@ -327,6 +340,14 @@
         <ion-label>Disable new teachers from signing in.</ion-label>
         <ion-toggle #legacy *ngIf="dist.teachers_enabled == null" [checked]="false" (click)="edit($event, 'teachers_enabled', !(legacy.checked))"></ion-toggle>
         <ion-toggle #legacy *ngIf="dist.teachers_enabled != null" [checked]="!dist.teachers_enabled" (click)="edit($event, 'teachers_enabled', !(legacy.checked))"></ion-toggle>
+      </ion-item>
+    </ion-list>
+    <ion-list>
+      <ion-list-header>Currently Out</ion-list-header>
+      <ion-item>
+        <ion-label>Let teachers view which students are out school-wide.</ion-label>
+        <ion-toggle #out *ngIf="dist.out_teachers == null" [checked]="false" (click)="edit($event, 'out_teachers', !(out.checked))"></ion-toggle>
+        <ion-toggle #out *ngIf="dist.out_teachers != null" [checked]="!dist.out_teachers" (click)="edit($event, 'out_teachers', !(out.checked))"></ion-toggle>
       </ion-item>
     </ion-list>
     <ion-list>

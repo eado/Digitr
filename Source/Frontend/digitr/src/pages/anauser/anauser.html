@@ -9,8 +9,9 @@
     <ion-navbar>
       <ion-toolbar>
         <ion-buttons start>
-              <button (click)="send()" ion-button>Send Message<ion-icon name="send"></ion-icon></button>
-          </ion-buttons>
+          <button (click)="send()" ion-button>Send<ion-icon name="send"></ion-icon></button>
+          <button *ngIf="isAdmin" (click)="remove()" color="danger" ion-button>Remove</button>
+        </ion-buttons>
         <ion-title>{{ user.name }}</ion-title>
         <ion-buttons end>
             <button (click)="done()" ion-button>Done</button>

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, ToastController, Modal, ModalController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, ToastController, Modal, ModalController, UrlSerializer } from 'ionic-angular';
 import { AuthService } from '../../auth.service';
 import { MessagePage } from '../message/message';
 
@@ -33,6 +33,25 @@ export class AnauserPage {
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad AnauserPage');
+  }
+
+  async remove() {
+    let alert = this.alertCtrl.create({
+      title: "Are you sure you would like to remove " + this.user.name + "?",
+      subTitle: "This is an irrevocable action.",
+      buttons: [
+        {
+          text: "No",
+          role: "cancel"
+        }, {
+          text: "Yes",
+          handler: () => {
+            this.a.remove(this.user.email);
+          }
+        }
+      ]
+    });
+    alert.present();
   }
 
   done() {

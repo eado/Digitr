@@ -41,6 +41,7 @@ export class NowTeachersPage {
 
   currentPage = "messages"
   analyticsPage = "stats"
+  searchseg = "students"
 
   dist;
   analytics;
@@ -51,6 +52,7 @@ export class NowTeachersPage {
 
   isAdmin = false;
   viewAsAdmin = false;
+  all = false;
 
   payment;
 
@@ -167,13 +169,27 @@ export class NowTeachersPage {
     this.getAnalytics()
   }
 
+  async setAll() {
+    this.all = !this.all;
+    this.getAnalytics();  
+  }
+
   async getAnalytics(event=null) {
+    if (this.searchseg == "teachers") {
+      let teachers = [];
+      this.dist.teachers_with_names.forEach(element => {
+        teachers.push(element[1])
+      });
+      this.students = teachers;
+      this.filteredStudents = this.students;
+      return
+    }
     if (this.viewAsAdmin) {
       this.stats = await this.a.getAdminStats()
       this.students = await this.a.getAdminUsers()
     } else {
-      this.stats = await this.a.getTeacherStats()
-    this.students = await this.a.getTeacherUsers()
+      this.stats = await this.a.getTeacherStats(this.all)
+      this.students = await this.a.getTeacherUsers()
     }
     this.filteredStudents = this.students
 
@@ -272,7 +288,7 @@ export class NowTeachersPage {
     let loading = this.loadingCtrl.create({content: "Loading teacher/admin data...", enableBackdropDismiss: true});
     loading.present();
     if (this.viewAsAdmin) {
-      this.stats = await this.a.getTeacherStats()
+      this.stats = await this.a.getTeacherStats(this.all)
       this.students = await this.a.getTeacherUsers()
       this.filteredStudents = this.students
       this.viewAsAdmin = false;
