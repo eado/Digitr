@@ -22,6 +22,7 @@ import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { AnauserPage } from '../pages/anauser/anauser';
 import { MessagePage } from '../pages/message/message';
 import { WhatsnewPage } from '../pages/whatsnew/whatsnew'; 
+import { CsvPage } from '../pages/csv/csv';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import { WhatsnewPage } from '../pages/whatsnew/whatsnew';
     TimerPage,
     AnauserPage,
     MessagePage,
-    WhatsnewPage
+    WhatsnewPage,
+    CsvPage
   ],
   imports: [
     BrowserModule,
@@ -63,7 +65,8 @@ import { WhatsnewPage } from '../pages/whatsnew/whatsnew';
     TimerPage,
     AnauserPage,
     MessagePage,
-    WhatsnewPage
+    WhatsnewPage,
+    CsvPage
   ],
   providers: [
     StatusBar,

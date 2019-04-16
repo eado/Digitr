@@ -330,6 +330,7 @@ export class AuthService {
                 request: "get_admin_stats",
                 token: this.getToken(),
                 email: localStorage.getItem('email'),
+                all: true
             }, value => {
                 r(value)
             })

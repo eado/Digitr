@@ -677,16 +677,19 @@ class Responder:
         for user in usersRef:
             for passs in user['history']:
                 try:
-                    if (self.request['all'] and district.get('out_teachers')) or use_admin:
+                    passs['user'] = user['name']
+                    if use_admin:
                         if not passs.get('timestamp_end'):
                             currently_out.append(passs['user'])
-                    else:
-                        if passs['teacher'] == stater['name']:
+                    elif passs['teacher'] == stater['name']:
+                        if not passs.get('timestamp_end'):
                             currently_out.append(passs['user'])
-                    if not use_admin:
-                        if passs['teacher'] != stater['name']:
-                            continue
-                    passs['user'] = user['name']
+                    elif (self.request['all'] and district.get('out_teachers')):
+                        if not passs.get('timestamp_end'):
+                            currently_out.append(passs['user'])
+                        continue
+                    else:
+                        continue
                     passes.append(passs)
                     if passs['name'] == 'Free':
                         freePasses.append(passs)

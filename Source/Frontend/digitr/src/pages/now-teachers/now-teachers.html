@@ -346,8 +346,8 @@
       <ion-list-header>Currently Out</ion-list-header>
       <ion-item>
         <ion-label>Let teachers view which students are out school-wide.</ion-label>
-        <ion-toggle #out *ngIf="dist.out_teachers == null" [checked]="false" (click)="edit($event, 'out_teachers', !(out.checked))"></ion-toggle>
-        <ion-toggle #out *ngIf="dist.out_teachers != null" [checked]="!dist.out_teachers" (click)="edit($event, 'out_teachers', !(out.checked))"></ion-toggle>
+        <ion-toggle #out *ngIf="dist.out_teachers == null" [checked]="false" (click)="edit($event, 'out_teachers', (out.checked))"></ion-toggle>
+        <ion-toggle #out *ngIf="dist.out_teachers != null" [checked]="dist.out_teachers" (click)="edit($event, 'out_teachers', (out.checked))"></ion-toggle>
       </ion-item>
     </ion-list>
     <ion-list>
