@@ -14,6 +14,7 @@
         </ion-buttons>
         <ion-title>{{ user.name }}</ion-title>
         <ion-buttons end>
+            <button *ngIf="isAdmin" (click)="getCSV()"  ion-button>Get CSV</button>
             <button (click)="done()" ion-button>Done</button>
         </ion-buttons>
       </ion-toolbar>
@@ -51,10 +52,9 @@
       </ion-item>
   
       <ion-item>
-        Timestamp
-        <ion-note item-end>
-          {{ tts(pass.timestamp) }}
-        </ion-note>
+        <ion-label>Timestamp</ion-label>
+        <ion-datetime *ngIf="!isAdmin" displayFormat="MM/DD/YYYY, h:m:s A" placeholder="{{ tts(pass.timestamp) }}" ></ion-datetime>
+        <ion-datetime *ngIf="isAdmin" displayFormat="MM/DD/YYYY, h:m:s A" placeholder="{{ tts(pass.timestamp) }}" (ionChange)="change($event, pass.timestamp)"></ion-datetime>
       </ion-item>
   
       <ion-item>

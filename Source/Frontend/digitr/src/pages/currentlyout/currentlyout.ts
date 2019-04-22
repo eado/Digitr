@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angular';
 
 /**
- * Generated class for the CsvPage page.
+ * Generated class for the CurrentlyoutPage page.
  *
  * See https://ionicframework.com/docs/components/#navigation for more info on
  * Ionic pages and navigation.
@@ -10,29 +10,27 @@ import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angul
 
 @IonicPage()
 @Component({
-  selector: 'page-csv',
-  templateUrl: 'csv.html',
+  selector: 'page-currentlyout',
+  templateUrl: 'currentlyout.html',
 })
-export class CsvPage {
+export class CurrentlyoutPage {
 
-  fromDate;
-  toDate;
-  fromTime;
-  toTime;
-  dest;
-
-  dests = [];
+  list = [];
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public vc: ViewController) {
-    this.dests = navParams.get("dests");
+    this.list = navParams.get('list')
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad CsvPage');
+    console.log('ionViewDidLoad CurrentlyoutPage');
   }
 
-  getCSV() {
-    this.vc.dismiss({fromDate: this.fromDate, toDate: this.toDate, fromTime: this.fromTime, toTime: this.toTime, dest: this.dest})
+  user(name) {
+    this.vc.dismiss(name)
+  }
+
+  done() {
+    this.vc.dismiss()
   }
 
 }

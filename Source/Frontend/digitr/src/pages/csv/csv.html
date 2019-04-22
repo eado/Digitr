@@ -13,6 +13,50 @@
 </ion-header>
 
 
-<ion-content padding>
-  
+<ion-content>
+  <ion-list>
+    <ion-list-header>Date</ion-list-header>
+    <ion-item>
+      <ion-label>From</ion-label>
+      <ion-datetime displayFormat="MM/DD/YYYY" [(ngModel)]="fromDate"></ion-datetime>
+    </ion-item>
+    <ion-item>
+      <ion-label>To</ion-label>
+      <ion-datetime displayFormat="MM/DD/YYYY" [(ngModel)]="toDate"></ion-datetime>
+    </ion-item>
+  </ion-list>
+  <ion-list>
+    <ion-list-header>Time (EST)</ion-list-header>
+    <ion-item>
+      <ion-label>From</ion-label>
+      <ion-datetime displayFormat="h:m a" [(ngModel)]="fromTime"></ion-datetime>
+    </ion-item>
+    <ion-item>
+      <ion-label>To</ion-label>
+      <ion-datetime displayFormat="h:m a" [(ngModel)]="toTime"></ion-datetime>
+    </ion-item>
+  </ion-list>
+  <ion-list radio-group [(ngModel)]="dest">
+    <ion-list-header>
+      Destination
+    </ion-list-header>
+    <ion-item>
+      <ion-label>Restroom</ion-label>
+      <ion-radio value="Restroom"></ion-radio>
+    </ion-item>
+    <ion-item>
+      <ion-label>Media Center</ion-label>
+      <ion-radio value="Media Center"></ion-radio>
+    </ion-item>
+    <ion-item>
+      <ion-label>Locker</ion-label>
+      <ion-radio value="Locker"></ion-radio>
+    </ion-item>
+    
+    <ion-item *ngFor="let destination of dests">
+      <ion-label>{{ destination }}</ion-label>
+      <ion-radio value="{{ destination }}"></ion-radio>
+    </ion-item>
+  </ion-list>
+  <button ion-button full color="primary" (click)="getCSV()">Get CSV</button>
 </ion-content>

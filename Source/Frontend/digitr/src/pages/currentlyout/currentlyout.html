@@ -1,0 +1,25 @@
+<!--
+  Generated template for the CurrentlyoutPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Currently Out</ion-title>
+    <ion-buttons end>
+        <button ion-button (click)="done()">Done</button>
+    </ion-buttons>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content>
+  <ion-list>
+    <ion-item *ngIf="!list">No one is currently out</ion-item>
+    <ion-item (click)="user(l)" *ngFor="let l of list">{{ l }}</ion-item>
+  </ion-list>
+
+</ion-content>

@@ -312,16 +312,8 @@ export class AuthService {
         })
     }
 
-    async getCSVTeacher(): Promise<string> {
-        return new Promise<string>((r, _) => {
-            this.scs.add({
-                request: "get_csv_for_teacher",
-                token: this.getToken(),
-                email: localStorage.getItem('email'),
-            }, value => {
-                r(value.csv_data)
-            })
-        })
+    async getCSVTeacher(data=null): Promise<string> {
+        return this.getCSVAdmin(false, data);
     }
 
     async getAdminStats(): Promise<any> {
@@ -361,12 +353,13 @@ export class AuthService {
         })
     }
 
-    async getCSVAdmin(): Promise<string> {
+    async getCSVAdmin(isAdmin=true, data=null): Promise<string> {
         return new Promise<string>((r, _) => {
             this.scs.add({
-                request: "get_csv_for_admin",
+                request: isAdmin ? "get_csv_for_admin" : "get_csv_for_teacher",
                 token: this.getToken(),
                 email: localStorage.getItem('email'),
+                ...data
             }, value => {
                 r(value.csv_data)
             })
@@ -406,6 +399,21 @@ export class AuthService {
                 request: "start_fresh",
                 token: this.getToken(),
                 email: localStorage.getItem('email'),
+            }, value => {
+                r()
+            })
+        })
+    }
+
+    async setTimestamp(user, timestamp, newTimestamp) {
+        return new Promise<void>((r, _) => {
+            this.scs.add({
+                request: "set_timestamp",
+                token: this.getToken(),
+                email: localStorage.getItem('email'),
+                user: user,
+                timestamp: timestamp,
+                newTimestamp: newTimestamp
             }, value => {
                 r()
             })

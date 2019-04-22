@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, ToastController, Modal, ModalController, UrlSerializer } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, ToastController, ModalController, ViewController } from 'ionic-angular';
 import { AuthService } from '../../auth.service';
 import { MessagePage } from '../message/message';
 
@@ -22,7 +22,9 @@ export class AnauserPage {
 
   isAdmin = false;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, public toastCtrl: ToastController, public modalCtrl: ModalController) {
+  dests = [];
+
+  constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, public toastCtrl: ToastController, public modalCtrl: ModalController, public vc: ViewController) {
     this.user = navParams.get('user')
     this.history = this.user.history;
 
@@ -33,6 +35,10 @@ export class AnauserPage {
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad AnauserPage');
+  }
+
+  getCSV() {
+    this.vc.dismiss({user: this.user.email})
   }
 
   async remove() {
@@ -62,6 +68,13 @@ export class AnauserPage {
     let date = new Date(timestamp * 1000);
   
     return date.toLocaleString('en-US')
+  }
+
+  async change(e, timestamp) {
+    let date = new Date(e.year, e.month - 1, e.day, e.hour, e.minute, e.second)
+    let newTimestamp = date.getTime() / 1000
+
+    await this.a.setTimestamp(this.user.email, timestamp, newTimestamp)
   }
 
   totalTime(start: number, minutes: number, end?: number): string {

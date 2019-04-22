@@ -172,15 +172,16 @@
                 <ion-card color="dark">
                   <ion-item color="dark">
                     <h3 id="mvp">Currently Out</h3>
+                    <ion-badge item-end (click)="viewCurrentlyOut()">View</ion-badge>
                     <ion-badge *ngIf="all && !viewAsAdmin" item-end (click)="setAll()">All</ion-badge>
                     <ion-badge *ngIf="!all && !viewAsAdmin" item-end (click)="setAll()">Teacher</ion-badge>
                   </ion-item>
-                  <ion-card-content>
+                  <!-- <ion-card-content>
                       <ion-list>
                         <ion-item *ngFor="let user of stats.currentlyOut" (click)="getUser(user)">{{ user }}</ion-item>
                       </ion-list>
                       <h1 *ngIf="stats.currentlyOut.length < 1">Nobody</h1>
-                  </ion-card-content>
+                  </ion-card-content> -->
                 </ion-card>
               </div>
               <div col-md-6 col-12>
@@ -348,6 +349,18 @@
         <ion-label>Let teachers view which students are out school-wide.</ion-label>
         <ion-toggle #out *ngIf="dist.out_teachers == null" [checked]="false" (click)="edit($event, 'out_teachers', (out.checked))"></ion-toggle>
         <ion-toggle #out *ngIf="dist.out_teachers != null" [checked]="dist.out_teachers" (click)="edit($event, 'out_teachers', (out.checked))"></ion-toggle>
+      </ion-item>
+    </ion-list>
+    <ion-list>
+      <ion-list-header>Limit students</ion-list-header>
+      <ion-item>
+        <ion-label>Provide a list of students' emails who are approved to use Digitr</ion-label>
+      </ion-item>
+      <ion-item>
+        <ion-textarea placeholder="student1@school.org,student2@school.org,..." [(ngModel)]="limit_students"></ion-textarea>
+      </ion-item>
+      <ion-item>
+        <button ion-button (click)="edit($event, 'limit_students', limit_students)">Save</button>
       </ion-item>
     </ion-list>
     <ion-list>

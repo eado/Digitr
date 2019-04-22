@@ -8,6 +8,8 @@ import { AnauserPage } from '../anauser/anauser';
 import { MessagePage } from '../message/message';
 import { MyApp } from '../../app/app.component';
 import { WhatsnewPage } from '../whatsnew/whatsnew';
+import { CsvPage } from '../csv/csv';
+import { CurrentlyoutPage } from '../currentlyout/currentlyout';
 
 /**
  * Generated class for the NowTeachersPage page.
@@ -61,6 +63,8 @@ export class NowTeachersPage {
   local_version = MyApp.LOCAL_VERSION;
 
   mvpenabled;
+
+  limit_students;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, private a: AuthService, public alertCtrl: AlertController, 
     public modalCtrl: ModalController, public toastCtrl: ToastController, public push: Push, 
@@ -132,6 +136,9 @@ export class NowTeachersPage {
         this.analytics = true
       } else {
         this.analytics = false
+      }
+      if (dist.limit_students) {
+        this.limit_students = dist.limit_students
       }
       if (this.dist.admins.indexOf(localStorage.getItem('email')) > -1) {
         this.isAdmin = true;
@@ -254,22 +261,50 @@ export class NowTeachersPage {
     this.a.signout()
   }
 
+  viewCurrentlyOut() {
+    let modal = this.modalCtrl.create(CurrentlyoutPage, {list: this.stats.currentlyOut})
+    modal.onDidDismiss((u) => {
+      if (u) {
+        this.getUser(u)
+      }
+    })
+    modal.present()
+  }
+
   async getUser(user1) {
     console.log(user1)
     let user = await this.a.getUserFromName(user1)
 
-    let modal = this.modalCtrl.create(AnauserPage, {user: user.user, isAdmin: this.isAdmin})
+    let modal = this.modalCtrl.create(AnauserPage, {user: user.user, isAdmin: this.isAdmin, dests: this.dist.destinations})
+    modal.onDidDismiss((mode) => {
+      if (mode) {
+        let modal2 = this.modalCtrl.create(CsvPage, {dests: this.dist.destinations});
+        modal2.onDidDismiss((data) => {
+          data.user = mode.user;
+          this.continueCSV(data);
+        });
+        modal2.present()
+      }
+    })
     modal.present()
   }
 
   async getCSV() {
+    let modal = this.modalCtrl.create(CsvPage, {dests: this.dist.destinations});
+    modal.onDidDismiss((data) => {
+      this.continueCSV(data);
+    });
+    modal.present()
+  }
+
+  async continueCSV(data) {
     let loading = this.loadingCtrl.create({content: "Loading csv data...", enableBackdropDismiss: true});
     loading.present();
     let string;
     if (this.viewAsAdmin) {
-      string = await this.a.getCSVAdmin()
+      string = await this.a.getCSVAdmin(true, data)
     } else {
-      string = await this.a.getCSVTeacher()
+      string = await this.a.getCSVAdmin(false, data)
     }
 
     var a = document.createElement("a");

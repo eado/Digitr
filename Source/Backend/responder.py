@@ -112,6 +112,8 @@ class Responder:
             self.reset_passes()
         elif request['request'] == 'start_fresh':
             self.start_fresh()
+        elif request['request'] == 'set_timestamp':
+            self.set_timestamp()
         elif request['request'] == 'get_payment_stats':
             self.get_payment_stats()
         elif request['request'] == 'start_payment':
@@ -163,7 +165,7 @@ class Responder:
         self.send({'schools': district["schools"], 'pass': district['pass'], 'destinations': district.get('destinations'), 
                    'teachers_with_names': teachers_with_names, 'admins': district["admins"], 'analytics': district.get('analytics'), 
                    'domains': district['domains'], 'legacy': district.get('legacy'), 'teachers_enabled': district.get("teachers_enabled"), 
-                   'out_teachers': district.get('out_teachers')})
+                   'out_teachers': district.get('out_teachers'), 'limit_students': district.get('limit_students')})
 
     def user_exists(self):
         user = self.db.users.find_one({'email': self.request['email']})
@@ -266,6 +268,14 @@ class Responder:
         if self.request['is_teacher'] and not (district.get("teachers_enabled", True)):
             self.send({'error': 'tne'})
             return
+
+        if (not self.request['is_teacher']) and district.get('limit_students'):
+            students = district['limit_students'].split(',')
+
+            if self.request['email'] not in students:
+                self.send({'error': 'nil'})
+                return
+            
 
         self.db.users.insert_one({
             'name': self.request['name'],
@@ -762,7 +772,7 @@ class Responder:
         self.send({'success': True})
 
     def get_csv(self, use_admin):
-        if use_admin:
+        if use_admin or self.request.get('user'):
             if not self.isAdmin():
                 self.send({'error': 'una'})
                 return
@@ -771,31 +781,72 @@ class Responder:
                 self.send({'error': 'uns'})
                 return
     
-        stater = self.db.users.find_one({'email': self.request['email']})
+        if self.request.get('user'):
+            stater = self.db.users.find_one({'email': self.request['user']})
+        else:
+            stater = self.db.users.find_one({'email': self.request['email']})
+
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
 
         query = {'domain': {'$in': district['domains']}}
-        if not use_admin:
+        if not use_admin or (stater['is_teacher'] and self.request.get('user')):
             query['history.teacher'] = stater['name']
+        elif not stater['is_teacher']:
+            query['email'] = stater['email']
         usersRef = self.db.users.find(query, {'history': True, 'name': True})
         text = "User,Pass,Destination,Teacher,Minutes,Timestamp(EST),End Time(EST)\n"
+
+        if (self.request.get('fromDate')):
+            fromDate = datetime.datetime.strptime(self.request['fromDate'], '%Y-%m-%d')
+
+        if (self.request.get('toDate')):
+            toDate = datetime.datetime.strptime(self.request['toDate'], '%Y-%m-%d')
+
+        if (self.request.get('fromTime')):
+            fromTime = datetime.datetime.strptime(self.request['fromTime'], '%H:%M').time()
+
+        if (self.request.get('toTime')):
+            toTime = datetime.datetime.strptime(self.request['toTime'], '%H:%M').time()
+        
 
         for user in usersRef:
             for passs in user['history']:
                 try:
-                    if not use_admin:
+                    if not use_admin or (stater['is_teacher'] and self.request.get('user')):
                         if passs['teacher'] != stater['name']:
                             continue
+                    
+                    timestamp = (datetime.datetime.fromtimestamp(
+                                    passs['timestamp']
+                                ) - datetime.timedelta(hours=5))
+
+                    if (self.request.get('fromDate')):
+                        if timestamp < fromDate:
+                            continue
+
+                    if (self.request.get('toDate')):
+                        if timestamp > toDate:
+                            continue
+
+                    if (self.request.get('fromTime')):
+                        if timestamp.time() < fromTime:
+                            continue
+
+                    if (self.request.get('toTime')):
+                        if timestamp.time() > toTime:
+                            continue
+
+                    if (self.request.get('dest')):
+                        if passs['destination'] != self.request['dest']:
+                            continue
+
                     text += (user['name'] + ',')
                     text += (str(passs['name']) + ',')
                     text += (passs['destination'] + ',')
                     text += (passs['teacher'] + ',')
                     text += (str(passs['minutes']) + ',')
 
-                    timestamp = (datetime.datetime.fromtimestamp(
-                                    passs['timestamp']
-                                ) - datetime.timedelta(hours=5)).strftime('%Y-%m-%d %H:%M:%S')
-                    text += (timestamp + ',')
+                    text += (timestamp.strftime('%Y-%m-%d %H:%M:%S') + ',')
 
                     timestamp_end = (datetime.datetime.fromtimestamp(
                                         passs.get('timestamp_end', passs['timestamp'])
@@ -806,6 +857,14 @@ class Responder:
                     continue
                     
         self.send({'csv_data': text})
+
+    def set_timestamp(self):
+        if not self.isAdmin():
+            self.send({'error': 'una'})
+            return
+        self.db.users.update_one({'email': self.request['user'], 'history.timestamp': self.request['timestamp']}, 
+                                 {'$set': {'history.$.timestamp': self.request['newTimestamp']}})
+        self.send({'success': True})
 
     def get_all_users(self):
         if not self.isAdmin():
@@ -877,14 +936,14 @@ class Responder:
                 self.db.districts.update(query, {'$set': {'out_teachers': True}})
             else:
                 self.db.districts.update(query, {'$set': {'out_teachers': False}})
-        
+        elif self.request['field'] == 'limit_students':
+            self.db.districts.update(query, {'$set': {'limit_students': self.request['data'].strip().lower()}})
         self.send({'success': True})
 
     def reset_passes(self):
         if not self.isAdmin():
             self.send({'error': 'una'})
             return
-        admin = self.db.users.find_one({'email': self.request['email']})
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
         
         self.db.users.update_many({'domain': {'$in': district['domains']}}, {'$set': {'history': []}})

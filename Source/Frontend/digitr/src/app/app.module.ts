@@ -23,6 +23,7 @@ import { AnauserPage } from '../pages/anauser/anauser';
 import { MessagePage } from '../pages/message/message';
 import { WhatsnewPage } from '../pages/whatsnew/whatsnew'; 
 import { CsvPage } from '../pages/csv/csv';
+import { CurrentlyoutPage } from '../pages/currentlyout/currentlyout';
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { CsvPage } from '../pages/csv/csv';
     AnauserPage,
     MessagePage,
     WhatsnewPage,
-    CsvPage
+    CsvPage,
+    CurrentlyoutPage
   ],
   imports: [
     BrowserModule,
@@ -66,7 +68,8 @@ import { CsvPage } from '../pages/csv/csv';
     AnauserPage,
     MessagePage,
     WhatsnewPage,
-    CsvPage
+    CsvPage,
+    CurrentlyoutPage
   ],
   providers: [
     StatusBar,
