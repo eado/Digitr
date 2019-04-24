@@ -307,7 +307,7 @@ export class NowTeachersPage {
       string = await this.a.getCSVAdmin(false, data)
     }
 
-    var a = document.createElement("a");
+    let a = document.createElement("a");
     document.body.appendChild(a);
     a.hidden = true
 
@@ -315,8 +315,12 @@ export class NowTeachersPage {
     let blob = new Blob([string], {type: 'text/csv'})
     let url = window.URL.createObjectURL(blob)
     a.href = url;
-    a.download = 'DigitrExport-' + Date.now() + '.csv'
-    a.click()
+    a.download = 'DigitrExport-' + new Date(Date.now()).toLocaleString();  + '.csv'
+    console.log(a)
+
+    setTimeout(() => {
+      a.click()
+    }, 1000) 
   }
 
   async toggleAdmin() {
