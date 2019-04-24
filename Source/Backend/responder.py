@@ -670,7 +670,7 @@ class Responder:
         district = self.db.districts.find_one({'domains': self.request['email'].split('@')[1]})
 
         query = {'domain': {'$in': district['domains']}}
-        if not use_admin:
+        if not use_admin or not self.request.get('all'):
             query['history.teacher'] = stater['name']
         usersRef = self.db.users.find(query, {'history': True, 'name': True})
         
