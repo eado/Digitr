@@ -315,7 +315,7 @@ export class NowTeachersPage {
     let blob = new Blob([string], {type: 'text/csv'})
     let url = window.URL.createObjectURL(blob)
     a.href = url;
-    a.download = 'DigitrExport-' + new Date(Date.now()).toLocaleString();  + '.csv'
+    a.download = 'DigitrExport-' + new Date(Date.now()).toLocaleString() + '.csv'
     console.log(a)
 
     setTimeout(() => {
