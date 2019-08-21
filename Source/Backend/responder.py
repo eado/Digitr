@@ -6,6 +6,7 @@ import sys
 import paypalrestsdk
 
 from multiprocessing import Process
+from threading import Thread, Timer
 
 from google.auth.transport import requests
 from google.oauth2 import id_token
@@ -42,11 +43,10 @@ class Responder:
     db = None
     mongo_client = None
 
-    def __init__(self, client, server, request):
+    def __init__(self, client, server, request, mongo_client):
         self.server = server
         self.client = client
-
-        self.mongo_client = MongoClient(port=3232)
+        self.mongo_client = mongo_client
 
         self.request = request
 
@@ -357,14 +357,16 @@ class Responder:
                 return    
         if not self.request.get('once'):
             clients.append(self.client)
-            while True:
-                sleep(1)
+
+            def repeat_get(user):
                 if not self.client in clients:
                     return
                 new_user = self.db.users.find_one({'email': self.request['user']})
                 if new_user != user:
                     user = new_user
                     self.send({'success': True, 'user': user})
+                Timer(2.0, repeat_get, [user]).start()
+            Timer(2.0, repeat_get, [user]).start()
 
     def get_user_from_name(self):
         if not self.verify_user():
@@ -530,35 +532,40 @@ class Responder:
 
         self.send_message(message, [self.request['user'] if not legacy else self.request['email']])
         
-        sleep(int((self.request['minutes'] if not legacy else 5) * 60))
-        user = self.db.users.find_one({'email': self.request['user']})
-        history = user['history']
-        for passs in history:
-            if passs['timestamp'] == timestamp and passs.get('timestamp_end'):
-                return
 
-        timestamp2 = datetime.datetime.now().timestamp()
-        self.send_message({
-            'user': teacher['name'],
-            'email': teacher['email'],
-            'type': 'pass_done',
-            'title': "Time's up",
-            'subTitle': 'Your pass time is over. Get back as soon as possible.',
-            'timestamp': timestamp2,
-            'pass_time': timestamp,
-            'name': name
-        }, [self.request['user'] if not legacy else self.request['email']])
+        sleep_amt = int((self.request['minutes'] if not legacy else 5) * 60)
 
-        self.send_message({
-            'user': user['name'] if not legacy else teacher['name'],
-            'email': user['email'] if not legacy else teacher['email'],
-            'type': 'pass_done',
-            'title': "Time's up",
-            'subTitle': "{}'s pass time is over.".format(user['name']),
-            'timestamp': timestamp2,
-            'pass_time': timestamp,
-            'name': name
-        }, [self.request['email'] if not legacy else self.request['user']])
+        def end_pass():
+            user = self.db.users.find_one({'email': self.request['user']})
+            history = user['history']
+            for passs in history:
+                if passs['timestamp'] == timestamp and passs.get('timestamp_end'):
+                    return
+
+            timestamp2 = datetime.datetime.now().timestamp()
+            self.send_message({
+                'user': teacher['name'],
+                'email': teacher['email'],
+                'type': 'pass_done',
+                'title': "Time's up",
+                'subTitle': 'Your pass time is over. Get back as soon as possible.',
+                'timestamp': timestamp2,
+                'pass_time': timestamp,
+                'name': name
+            }, [self.request['user'] if not legacy else self.request['email']])
+
+            self.send_message({
+                'user': user['name'] if not legacy else teacher['name'],
+                'email': user['email'] if not legacy else teacher['email'],
+                'type': 'pass_done',
+                'title': "Time's up",
+                'subTitle': "{}'s pass time is over.".format(user['name']),
+                'timestamp': timestamp2,
+                'pass_time': timestamp,
+                'name': name
+            }, [self.request['email'] if not legacy else self.request['user']])
+
+        Timer(sleep_amt, end_pass).start()
 
     def back_from_pass(self):
         if not self.verify_user():

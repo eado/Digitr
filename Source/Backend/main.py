@@ -27,25 +27,22 @@ fh = logging.FileHandler('spam.log')
 fh.setLevel(logging.INFO)
 logger.addHandler(fh)
 
+mongo_client = MongoClient(port=3232)
+
 def message_received(client, server, message):
     request = json.loads(message)
-    def start_responder(client, server, message):
-        try:
-            Responder(client, server, request)
-        except json.JSONDecodeError as e:
-            server.send_message(client, 'Invalid request. {}'.format(e))
-        except KeyError as e:
-            server.send_message(client, 'Invalid request. {}'.format(e))
+    try:
+        Responder(client, server, request, mongo_client)
+    except json.JSONDecodeError as e:
+        server.send_message(client, 'Invalid request. {}'.format(e))
+    except KeyError as e:
+        server.send_message(client, 'Invalid request. {}'.format(e))
 
-    p = Thread(target=start_responder, args=(client, server, message))
-    p.daemon = True
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + ", " + 
               p.name + ", " + 
               client['address'][0] + ", " + 
               request.get('request') if not None else "None" + ", " + 
               request.get('email') if not None else "None" + "\n")
-    
-    p.start()
 
 def client_left(client1, server):
     if client1 in clients:
@@ -59,7 +56,7 @@ def start_server():
     server.run_forever()
 
 def start_payment_service():
-    mongo_client = MongoClient(port=3232)
+    # mongo_client = MongoClient(port=3232)
     db = mongo_client.digitr
 
     while True:
@@ -87,7 +84,7 @@ def start_payment_service():
         sleep(3600)
 
 def send_students_back():
-    mongo_client = MongoClient(port=3232)
+    # mongo_client = MongoClient(port=3232)
     db = mongo_client.digitr
 
     while True:
