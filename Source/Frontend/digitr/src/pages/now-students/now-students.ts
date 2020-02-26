@@ -195,6 +195,8 @@ export class NowStudentsPage {
   }
 
   dismiss(message: number) {
+    this.user.messages = (this.user.messages as any[]).filter(m => m.timestamp === message)
+    console.log(this.user.messages)
     this.a.dismissMessage(message)
   }
 
@@ -203,14 +205,9 @@ export class NowStudentsPage {
     modal.present()
   }
 
-  async back(message: number, email: string) {
-    await this.a.back_from_pass(message, email)
+  back(message: number, email: string) {
     this.dismiss(message)
-    for (let nmessage of this.user.messages) {
-      if (nmessage.type == "pass_approved" || nmessage.type == "pass_done") {
-        this.dismiss(nmessage.timestamp)
-      }
-    }
+    this.a.back_from_pass(message, email)
   }
 
   totalTime(start: number, minutes: number, end?: number): string {

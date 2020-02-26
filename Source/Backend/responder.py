@@ -536,7 +536,7 @@ class Responder:
         sleep_amt = int((self.request['minutes'] if not legacy else 5) * 60)
 
         def end_pass():
-            user = self.db.users.find_one({'email': self.request['user']})
+            user = self.db.users.find_one({'email': self.request['user'] if not legacy else self.request['email']})
             history = user['history']
             for passs in history:
                 if passs['timestamp'] == timestamp and passs.get('timestamp_end'):
@@ -555,8 +555,8 @@ class Responder:
             }, [self.request['user'] if not legacy else self.request['email']])
 
             self.send_message({
-                'user': user['name'] if not legacy else teacher['name'],
-                'email': user['email'] if not legacy else teacher['email'],
+                'user': user['name'],
+                'email': user['email'],
                 'type': 'pass_done',
                 'title': "Time's up",
                 'subTitle': "{}'s pass time is over.".format(user['name']),
