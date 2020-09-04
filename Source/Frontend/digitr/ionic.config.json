@@ -1,7 +1,8 @@
 {
   "name": "Digitr",
   "integrations": {
-    "cordova": {}
+    "cordova": {},
+    "capacitor": {}
   },
   "type": "ionic-angular"
 }

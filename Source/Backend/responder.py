@@ -329,7 +329,7 @@ class Responder:
 
         try:
             conn = SMTP('smtp.gmail.com')
-            conn.login("info@digitrapp.com", "Adilemi1971")
+            conn.login("info@digitrapp.com", "hpwugcebfqsxzkue")
 
             try: 
                 conn.sendmail(user, user, msg.as_string())

@@ -58,7 +58,7 @@ export class MyApp {
           console.log('ios')
           this.googlePlus.trySilentLogin({
             scopes: 'profile email',
-            offline: false
+            offline: true
           }).then(
             (user) => {
               if (user) {
