@@ -129,7 +129,7 @@ export class NowTeachersPage {
       }
       this.user = user
       this.first = false;
-    })
+    }).catch(console.log)
     this.a.getDistrictInfo().then(dist => {
       this.dist = dist;
       if (dist.analytics) {
@@ -172,8 +172,8 @@ export class NowTeachersPage {
           })
         }
       }
-    })
-    this.getAnalytics()
+    }).catch(console.log)
+    this.getAnalytics().catch(console.log)
   }
 
   async setAll() {
@@ -220,7 +220,7 @@ export class NowTeachersPage {
     let modal = this.modalCtrl.create(ApprovepassPage, {message: message});
     modal.onDidDismiss((value) => {
       console.log(value)
-      if (!value.minutes) {
+      if (!value || !value.minutes) {
         return
       }
       this.a.approvePass(value.give, message.destination, value.minutes, message.email).then(
@@ -239,6 +239,7 @@ export class NowTeachersPage {
   }
 
   dismiss(message: number) {
+    this.user.messages = (this.user.messages as any[]).filter(m => m.timestamp !== message)
     this.a.dismissMessage(message)
   }
 

@@ -166,7 +166,7 @@
         <ion-item text-wrap *ngSwitchCase="'pass_approved'">
           <b>{{ message.title }}: </b>{{ message.subTitle }}
           <ion-note item-end color="dark"><button ion-button small (click)="viewTimer(message)">View Timer</button></ion-note>
-          <ion-note item-end><button ion-button small (click)="back(message.timestamp, message.email)">I'm back</button></ion-note>
+          <ion-note item-end><button ion-button small (click)="back(message.timestamp, message.email, message.timestamp)">I'm back</button></ion-note>
           <!-- <ion-note item-end><button ion-button small (click)="dismiss(message.timestamp)">Dismiss</button></ion-note> -->
         </ion-item>
         <ion-item text-wrap *ngSwitchCase="'pass_rejected'">
@@ -175,7 +175,7 @@
         </ion-item>
         <ion-item text-wrap *ngSwitchCase="'pass_done'">
           <b>{{ message.title }}: </b>{{ message.subTitle }}
-          <ion-note item-end><button ion-button small (click)="back(message.pass_time, message.email)">I'm back</button></ion-note>
+          <ion-note item-end><button ion-button small (click)="back(message.pass_time, message.email, message.timestamp)">I'm back</button></ion-note>
           <!-- <ion-note item-end><button ion-button small (click)="dismiss(message.timestamp)">Dismiss</button></ion-note> -->
         </ion-item>
         <ion-item text-wrap *ngSwitchDefault>

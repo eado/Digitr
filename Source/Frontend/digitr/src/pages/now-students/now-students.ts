@@ -129,9 +129,9 @@ export class NowStudentsPage {
         this.teachers = this.districtInfo.teachers
         this.teachersWithNames = this.districtInfo.teachers_with_names
         this.circle.animate(this.passesRemaining / this.totalPasses)
-      })
+      }).catch(console.log)
       this.first = false;
-    })
+    }).catch(console.log)
   }
 
   changed(seg) {
@@ -195,7 +195,7 @@ export class NowStudentsPage {
   }
 
   dismiss(message: number) {
-    this.user.messages = (this.user.messages as any[]).filter(m => m.timestamp === message)
+    this.user.messages = (this.user.messages as any[]).filter(m => m.timestamp !== message)
     console.log(this.user.messages)
     this.a.dismissMessage(message)
   }
@@ -205,8 +205,8 @@ export class NowStudentsPage {
     modal.present()
   }
 
-  back(message: number, email: string) {
-    this.dismiss(message)
+  back(message: number, email: string, timestamp: number) {
+    this.dismiss(timestamp)
     this.a.back_from_pass(message, email)
   }
 

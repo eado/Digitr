@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { ToastController } from "../node_modules/ionic-angular";
 import { checkAndUpdateBinding } from "../node_modules/@angular/core/src/view/util";
 
-const URL = "wss://server.digitrapp.com:9001";
+const URL = "ws://localhost:9001";
 
 @Injectable()
 export class ServerconnService {
