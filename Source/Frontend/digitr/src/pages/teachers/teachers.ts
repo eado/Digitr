@@ -31,6 +31,7 @@ export class TeachersPage {
     }
 
     let teachersArray: [string, string][] = this.navParams.get('teachers')
+    teachersArray.sort((a, b) => a[1].localeCompare(b[1]))
     let teach: string[] = []
     for (let teacher of teachersArray) {
       teach.push(teacher[1])
